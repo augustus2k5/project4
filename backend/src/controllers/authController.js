@@ -38,6 +38,10 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: 'Email hoặc mật khẩu không đúng!' });
     }
 
+    if (user.status !== 'ACTIVE') {
+      return res.status(403).json({ message: 'Tài khoản của bạn đã bị khóa hoặc ngừng hoạt động!' });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Email hoặc mật khẩu không đúng!' });
