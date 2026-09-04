@@ -12,11 +12,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Auth
 app.use('/api/auth', require('./routes/authRoutes'));
-
-// User
 app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/specialties', require('./routes/specialtyRoutes')); 
 
 const PORT = process.env.PORT || 5000;
 
