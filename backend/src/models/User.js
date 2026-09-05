@@ -18,6 +18,11 @@ const userSchema = new mongoose.Schema({
     type: String, 
     enum: ['PATIENT', 'DOCTOR', 'ADMIN'], 
     default: 'PATIENT' 
+  },
+  status: {
+    type: String,
+    enum: ['ACTIVE', 'INACTIVE', 'BLOCKED'],
+    default: 'ACTIVE'
   }
 }, { timestamps: true });
 
