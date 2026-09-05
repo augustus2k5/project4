@@ -38,6 +38,10 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: 'Email hoặc mật khẩu không đúng!' });
     }
 
+    if (user.status !== 'ACTIVE') {
+      return res.status(403).json({ message: 'Tài khoản của bạn đã bị khóa hoặc ngừng hoạt động!' });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Email hoặc mật khẩu không đúng!' });
@@ -62,5 +66,15 @@ exports.login = async (req, res) => {
 
   } catch (error) {
     res.status(500).json({ message: error.message });
-  }
+  
+  const express = require('express');
+const router = express.Router();
+
+const { register, login } = require('../controllers/authController');
+
+router.post('/register', register);
+router.post('/login', login);
+
+module.exports = router;
+}
 };
