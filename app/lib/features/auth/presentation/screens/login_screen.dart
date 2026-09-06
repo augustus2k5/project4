@@ -1,7 +1,10 @@
 import 'package:app/features/auth/presentation/screens/register_screen.dart';
+import 'package:app/features/auth/providers/auth_provider.dart';
+import 'package:app/features/home/presentation/screens/home_wrapper_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:app/core/widgets/app_text_field.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,7 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  bool _isLoading = false;
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -22,14 +25,36 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _handleLogin() {
+  Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
-    // TODO: gọi AuthProvider.login() ở bước sau
+    //gọi provider
+    final authProvider = context.read<AuthProvider>();
+    // Gọi Login trong Provder
+    final success = await authProvider.login(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+    );
+    if (success) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              HomeWrapperScreen(role: authProvider.currentUser!.role),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(authProvider.errorMessage ?? 'Đăng nhập thất bại'),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final authProvider = context.watch<AuthProvider>();
     return Scaffold(
       backgroundColor: const Color(0xFFF5FBFA),
       body: SafeArea(
@@ -150,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(
                   height: 52,
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : _handleLogin,
+                    onPressed: authProvider.isLoading ? null : _handleLogin,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF14B8A6),
                       foregroundColor: Colors.white,
@@ -159,7 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    child: _isLoading
+                    child: authProvider.isLoading
                         ? const SizedBox(
                             width: 22,
                             height: 22,
@@ -169,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           )
                         : const Text(
-                            'Đăng nhập',
+                            'Đăng nhập ',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,

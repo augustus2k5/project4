@@ -45,4 +45,39 @@ class AuthRepository {
       };
     }
   }
+
+  /// đăng nhập
+  Future<Map<String, dynamic>> login({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConstants.loginUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'password': password}),
+      );
+      print('STATUS CODE: ${response.statusCode}');
+      print('RESPONSE BODY: ${response.body}');
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': data['message'],
+          'token': data['token'],
+          'user': data['user'],
+        };
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Đăng nhập thất bại!',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại!',
+      };
+    }
+  }
 }

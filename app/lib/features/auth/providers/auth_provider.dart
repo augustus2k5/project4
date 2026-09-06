@@ -51,11 +51,21 @@ class AuthProvider extends ChangeNotifier {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
-
-    // TODO: gọi _authRepository.login()
+    final result = await _authRepository.login(
+      email: email,
+      password: password,
+    );
     _isLoading = false;
-    notifyListeners();
-    return true;
+    if (result['success'] == true) {
+      _token = result['token'];
+      _currentUser = UserModels.fromJson(result['user']);
+      notifyListeners();
+      return true;
+    } else {
+      _errorMessage = result['message'];
+      notifyListeners();
+      return false;
+    }
   }
 
   /// Đăng xuất

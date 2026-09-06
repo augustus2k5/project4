@@ -18,12 +18,35 @@ enum UserRole {
   String toShortString() => name.toUpperCase();
 }
 
+enum UserStatus {
+  active,
+  inactive,
+  blocked;
+
+  static UserStatus fromString(String status) {
+    switch (status.toUpperCase()) {
+      case 'INACTIVE':
+        return UserStatus.inactive;
+      case 'BLOCKED':
+        return UserStatus.blocked;
+      case 'ACTIVE':
+      default:
+        return UserStatus.active;
+    }
+  }
+
+  String toShortString() {
+    return name.toUpperCase();
+  }
+}
+
 class UserModels {
   final String id;
   final String fullName;
   final String email;
   final String phoneNumber;
   final UserRole role;
+  final UserStatus status;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -33,6 +56,7 @@ class UserModels {
     required this.email,
     required this.phoneNumber,
     required this.role,
+    required this.status,
     this.createdAt,
     this.updatedAt,
   });
@@ -44,6 +68,7 @@ class UserModels {
       email: json['email'] ?? '',
       phoneNumber: json['phoneNumber'] ?? '',
       role: UserRole.fromString(json['role'] ?? 'PATIENT'),
+      status: UserStatus.fromString(json['status'] ?? 'ACTIVE'),
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : null,
@@ -60,6 +85,7 @@ class UserModels {
       'email': email,
       'phoneNumber': phoneNumber,
       'role': role.toShortString(),
+      'status': status.toShortString(),
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };
