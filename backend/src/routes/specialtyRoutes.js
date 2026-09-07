@@ -10,19 +10,19 @@ const {
   deleteSpecialty,
 } = require('../controllers/specialtyController');
 
-// GET tất cả
+// GET tất cả chuyên khoa
 router.get('/', getSpecialties);
 
-// GET theo ID
+// GET 1 chuyên khoa theo ID
 router.get('/:id', getSpecialtyById);
 
-// POST thêm
+// POST thêm chuyên khoa
 router.post('/', createSpecialty);
 
-// PUT sửa
+// PUT sửa chuyên khoa
 router.put('/:id', updateSpecialty);
 
-// DELETE xóa
+// DELETE xóa chuyên khoa
 router.delete('/:id', deleteSpecialty);
 
 module.exports = router;

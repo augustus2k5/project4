@@ -4,7 +4,6 @@ const Specialty = require('../models/Specialty');
 // LẤY TẤT CẢ CHUYÊN KHOA
 // GET /api/specialties
 // ============================================================
-
 const getSpecialties = async (req, res) => {
   try {
     const specialties = await Specialty.find()
@@ -25,12 +24,9 @@ const getSpecialties = async (req, res) => {
 // LẤY 1 CHUYÊN KHOA
 // GET /api/specialties/:id
 // ============================================================
-
 const getSpecialtyById = async (req, res) => {
   try {
-    const specialty = await Specialty.findById(
-      req.params.id
-    );
+    const specialty = await Specialty.findById(req.params.id);
 
     if (!specialty) {
       return res.status(404).json({
@@ -53,27 +49,24 @@ const getSpecialtyById = async (req, res) => {
 // THÊM CHUYÊN KHOA
 // POST /api/specialties
 // ============================================================
-
 const createSpecialty = async (req, res) => {
   try {
     const {
       name,
       description,
       status,
+      iconUrl,
     } = req.body;
 
-    // Kiểm tra tên
     if (!name || !name.trim()) {
       return res.status(400).json({
         message: 'Tên chuyên khoa là bắt buộc',
       });
     }
 
-    // Kiểm tra trùng
-    const existingSpecialty =
-      await Specialty.findOne({
-        name: name.trim(),
-      });
+    const existingSpecialty = await Specialty.findOne({
+      name: name.trim(),
+    });
 
     if (existingSpecialty) {
       return res.status(400).json({
@@ -85,6 +78,7 @@ const createSpecialty = async (req, res) => {
       name: name.trim(),
       description: description || '',
       status: status || 'ACTIVE',
+      iconUrl: iconUrl || '',
     });
 
     res.status(201).json({
@@ -105,28 +99,28 @@ const createSpecialty = async (req, res) => {
 // SỬA CHUYÊN KHOA
 // PUT /api/specialties/:id
 // ============================================================
-
 const updateSpecialty = async (req, res) => {
   try {
     const {
       name,
       description,
       status,
+      iconUrl,
     } = req.body;
 
-    const specialty =
-      await Specialty.findByIdAndUpdate(
-        req.params.id,
-        {
-          name: name?.trim(),
-          description: description || '',
-          status: status || 'ACTIVE',
-        },
-        {
-          new: true,
-          runValidators: true,
-        }
-      );
+    const specialty = await Specialty.findByIdAndUpdate(
+      req.params.id,
+      {
+        name: name?.trim(),
+        description: description || '',
+        status: status || 'ACTIVE',
+        iconUrl: iconUrl || '',
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
     if (!specialty) {
       return res.status(404).json({
@@ -152,13 +146,11 @@ const updateSpecialty = async (req, res) => {
 // XÓA CHUYÊN KHOA
 // DELETE /api/specialties/:id
 // ============================================================
-
 const deleteSpecialty = async (req, res) => {
   try {
-    const specialty =
-      await Specialty.findByIdAndDelete(
-        req.params.id
-      );
+    const specialty = await Specialty.findByIdAndDelete(
+      req.params.id
+    );
 
     if (!specialty) {
       return res.status(404).json({
