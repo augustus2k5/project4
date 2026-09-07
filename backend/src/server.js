@@ -38,6 +38,8 @@ app.use(
   require('./routes/doctorRoutes')
 );
 
+app.use('/api/appointments', require('./routes/appointmentRoutes'));
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
