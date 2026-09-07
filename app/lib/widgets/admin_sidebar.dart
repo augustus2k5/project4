@@ -48,44 +48,51 @@ class AdminSidebar extends StatelessWidget {
             color: Colors.white24,
           ),
 
+          // DASHBOARD
           _menuItem(
             icon: Icons.dashboard,
             title: 'Dashboard',
             index: 0,
           ),
 
+          // NGƯỜI DÙNG
           _menuItem(
             icon: Icons.people,
             title: 'Người dùng',
             index: 1,
           ),
 
+          // BÁC SĨ
           _menuItem(
             icon: Icons.medical_services,
             title: 'Bác sĩ',
             index: 2,
           ),
 
+          // CHUYÊN KHOA
           _menuItem(
-            icon: Icons.personal_injury,
-            title: 'Bệnh nhân',
+            icon: Icons.local_hospital,
+            title: 'Chuyên khoa',
             index: 3,
           ),
 
+          // BỆNH NHÂN
+          _menuItem(
+            icon: Icons.personal_injury,
+            title: 'Bệnh nhân',
+            index: 4,
+          ),
+
+          // LỊCH HẸN
           _menuItem(
             icon: Icons.calendar_month,
             title: 'Lịch hẹn',
-            index: 4,
+            index: 5,
           ),
 
           const Spacer(),
 
-          _menuItem(
-            icon: Icons.settings,
-            title: 'Cài đặt',
-            index: 5,
-          ),
-
+          // ĐĂNG XUẤT
           _menuItem(
             icon: Icons.logout,
             title: 'Đăng xuất',
