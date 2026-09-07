@@ -12,31 +12,27 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ===============================
-// AUTH
-// ===============================
+
 app.use('/api/auth', require('./routes/authRoutes'));
 
-// ===============================
-// USERS
-// ===============================
 app.use('/api/users', require('./routes/userRoutes'));
 
-// ===============================
-// SPECIALTIES
-// ===============================
+
 app.use(
   '/api/specialties',
   require('./routes/specialtyRoutes')
 );
 
-// ===============================
-// DOCTORS
-// ===============================
+
 app.use(
   '/api/doctors',
   require('./routes/doctorRoutes')
 );
+
+app.use('/api/medical-records', require('./routes/medicalRecordRoutes'));
+
+app.use('/api/appointments', require('./routes/appointmentRoutes'));
+
 
 const PORT = process.env.PORT || 5000;
 

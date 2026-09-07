@@ -3,6 +3,8 @@ import 'package:app/features/auth/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'screens/admin/admin_dashboard.dart';
+
 void main() {
   runApp(const MyApp());
 }
