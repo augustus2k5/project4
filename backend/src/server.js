@@ -32,7 +32,7 @@ app.use(
 app.use('/api/medical-records', require('./routes/medicalRecordRoutes'));
 
 app.use('/api/appointments', require('./routes/appointmentRoutes'));
-
+app.use('/api/reviews', require('./routes/reviewRoutes'));
 
 const PORT = process.env.PORT || 5000;
 
