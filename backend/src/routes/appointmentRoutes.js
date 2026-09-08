@@ -7,8 +7,12 @@ const {
   updateAppointmentStatus 
 } = require('../controllers/appointmentController');
 
+const { verifyToken, authorizeRoles } = require('../middleware/authMiddleware');
 
-router.post('/', createAppointment);                         
-router.get('/patient/:patientId', getPatientAppointments);  
-router.patch('/:id/status', updateAppointmentStatus);      
+router.post('/', verifyToken, createAppointment);                       
+
+router.get('/patient/:patientId', verifyToken, getPatientAppointments);  
+
+router.patch('/:id/status', verifyToken, authorizeRoles('DOCTOR', 'ADMIN'), updateAppointmentStatus); 
+
 module.exports = router;
