@@ -3,7 +3,7 @@ import 'package:app/features/auth/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'screens/admin/admin_dashboard.dart';
+// import 'screens/admin/admin_dashboard.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
-        home: const LoginScreen(),
+        // home: const LoginScreen(),
       ),
     );
   }
