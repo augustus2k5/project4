@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'screens/admin/admin_dashboard.dart';
+import 'screens/admin/login/login_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
 
-      home: const AdminDashboard(),
+      home: const AdminLoginScreen(),
     );
   }
 }
