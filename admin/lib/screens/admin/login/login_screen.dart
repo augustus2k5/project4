@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../services/api_service.dart';
 import '../admin_dashboard.dart';
+import '../../../services/token_manager.dart';
 
 class AdminLoginScreen extends StatefulWidget {
   const AdminLoginScreen({super.key});
@@ -27,12 +28,9 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
-    // Kiểm tra nhập đủ thông tin
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Vui lòng nhập email và mật khẩu!'),
-        ),
+        const SnackBar(content: Text('Vui lòng nhập email và mật khẩu!')),
       );
       return;
     }
@@ -42,10 +40,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     });
 
     try {
-      final result = await ApiService.login(
-        email,
-        password,
-      );
+      final result = await ApiService.login(email, password);
 
       if (!mounted) return;
 
@@ -59,18 +54,21 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
 
         // Kiểm tra role ADMIN
         if (user != null && user['role'] == 'ADMIN') {
+          // 1. Lưu token vào bộ nhớ thiết bị
+          if (result['token'] != null) {
+            await TokenManager.saveToken(result['token']);
+          }
+
+          // 2. Chuyển sang trang AdminDashboard
+          if (!mounted) return;
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (context) => const AdminDashboard(),
-            ),
+            MaterialPageRoute(builder: (context) => const AdminDashboard()),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text(
-                'Tài khoản này không có quyền truy cập Admin!',
-              ),
+              content: Text('Tài khoản này không có quyền truy cập Admin!'),
             ),
           );
         }
@@ -91,11 +89,9 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
         _isLoading = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Có lỗi xảy ra: $e'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Có lỗi xảy ra: $e')));
     }
   }
 
@@ -153,10 +149,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
 
                 const Text(
                   'Đăng nhập vào trang quản trị',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
                 ),
 
                 const SizedBox(height: 30),
@@ -242,10 +235,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                 const Text(
                   'Chỉ tài khoản ADMIN mới có quyền truy cập.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],
             ),
