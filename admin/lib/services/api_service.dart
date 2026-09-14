@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 import '../models/user_model.dart';
 import '../models/specialty_model.dart';
-
+import 'token_manager.dart';
 class ApiService {
   // =========================
   // BASE URL
@@ -64,22 +64,26 @@ class ApiService {
   // LẤY DANH SÁCH USER
   // GET /api/users
   // ============================================================
+  // ============================================================
+  // LẤY DANH SÁCH USER
+  // GET /api/users
+  // ============================================================
   static Future<List<UserModel>> getUsers() async {
+    final token = await TokenManager.getToken();
     final response = await http.get(
       Uri.parse('$baseUrl/users'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
     );
 
     if (response.statusCode == 200) {
       final List data = jsonDecode(response.body);
-
-      return data
-          .map((json) => UserModel.fromJson(json))
-          .toList();
+      return data.map((json) => UserModel.fromJson(json)).toList();
     }
 
-    throw Exception(
-      'Không thể lấy danh sách người dùng',
-    );
+    throw Exception('Không thể lấy danh sách người dùng');
   }
 
   // ============================================================
@@ -87,8 +91,13 @@ class ApiService {
   // DELETE /api/users/:id
   // ============================================================
   static Future<bool> deleteUser(String id) async {
+    final token = await TokenManager.getToken();
     final response = await http.delete(
       Uri.parse('$baseUrl/users/$id'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
     );
 
     return response.statusCode == 200;
@@ -99,8 +108,13 @@ class ApiService {
   // PUT /api/users/:id/block
   // ============================================================
   static Future<bool> blockUser(String id) async {
+    final token = await TokenManager.getToken();
     final response = await http.put(
       Uri.parse('$baseUrl/users/$id/block'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
     );
 
     return response.statusCode == 200;
@@ -111,8 +125,13 @@ class ApiService {
   // PUT /api/users/:id/unblock
   // ============================================================
   static Future<bool> unblockUser(String id) async {
+    final token = await TokenManager.getToken();
     final response = await http.put(
       Uri.parse('$baseUrl/users/$id/unblock'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
     );
 
     return response.statusCode == 200;
@@ -123,21 +142,21 @@ class ApiService {
   // GET /api/specialties
   // ============================================================
   static Future<List<Specialty>> getSpecialties() async {
+    final token = await TokenManager.getToken();
     final response = await http.get(
       Uri.parse('$baseUrl/specialties'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
     );
 
     if (response.statusCode == 200) {
       final List data = jsonDecode(response.body);
-
-      return data
-          .map((json) => Specialty.fromJson(json))
-          .toList();
+      return data.map((json) => Specialty.fromJson(json)).toList();
     }
 
-    throw Exception(
-      'Không thể lấy danh sách chuyên khoa',
-    );
+    throw Exception('Không thể lấy danh sách chuyên khoa');
   }
 
   // ============================================================
@@ -149,10 +168,12 @@ class ApiService {
     required String description,
     required String status,
   }) async {
+    final token = await TokenManager.getToken();
     final response = await http.post(
       Uri.parse('$baseUrl/specialties'),
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
         'name': name,
@@ -174,10 +195,12 @@ class ApiService {
     required String description,
     required String status,
   }) async {
+    final token = await TokenManager.getToken();
     final response = await http.put(
       Uri.parse('$baseUrl/specialties/$id'),
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
         'name': name,
@@ -194,8 +217,13 @@ class ApiService {
   // DELETE /api/specialties/:id
   // ============================================================
   static Future<bool> deleteSpecialty(String id) async {
+    final token = await TokenManager.getToken();
     final response = await http.delete(
       Uri.parse('$baseUrl/specialties/$id'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
     );
 
     return response.statusCode == 200;

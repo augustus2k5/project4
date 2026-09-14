@@ -1,5 +1,3 @@
-import 'package:app/features/auth/presentation/screens/login_screen.dart';
-import 'package:app/features/auth/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,13 +13,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => AuthProvider())],
-
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
-        // home: const LoginScreen(),
+      providers: [], // Để trống danh sách provider tạm thời
+      child: const MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Text('App đang phát triển'),
+          ),
+        ),
       ),
     );
   }
