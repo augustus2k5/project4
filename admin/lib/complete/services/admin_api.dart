@@ -1,4 +1,39 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-class AdminApi{static String get base=>kIsWeb?'http://localhost:5000/api':'http://10.0.2.2:5000/api';String? token;Map<String,String> h()=>{'Content-Type':'application/json',if(token!=null)'Authorization':'Bearer $token'};Future<dynamic> req(String method,String path,[Map<String,dynamic>? body])async{final u=Uri.parse('$base$path');late http.Response r;if(method=='GET')r=await http.get(u,headers:h());else if(method=='POST')r=await http.post(u,headers:h(),body:jsonEncode(body));else if(method=='PATCH')r=await http.patch(u,headers:h(),body:jsonEncode(body));else r=await http.delete(u,headers:h());dynamic d;try{d=jsonDecode(r.body);}catch(_){d={};}if(r.statusCode<200||r.statusCode>=300)throw Exception(d is Map?(d['message']??'Có lỗi xảy ra'):'Có lỗi xảy ra');return d;}Future<Map<String,dynamic>> login(String email,String password)async{final d=await req('POST','/auth/login',{'email':email,'password':password});token=d['token'];return Map<String,dynamic>.from(d['user']);}}
+
+class AdminApi {
+  static String token = '';
+  static String get base => kIsWeb ? 'http://localhost:5000/api' : 'http://10.0.2.2:5000/api';
+
+  Future<dynamic> req(String method, String path, {Map<String, dynamic>? body}) async {
+    try {
+      final uri = Uri.parse('$base$path');
+      final headers = {
+        'Content-Type': 'application/json',
+        if (token.isNotEmpty) 'Authorization': 'Bearer $token',
+      };
+
+      http.Response res;
+      if (method == 'POST') {
+        res = await http.post(uri, headers: headers, body: jsonEncode(body));
+      } else if (method == 'PUT') {
+        res = await http.put(uri, headers: headers, body: jsonEncode(body));
+      } else {
+        res = await http.get(uri, headers: headers);
+      }
+
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        final data = jsonDecode(res.body);
+        // Lưu token tự động khi login thành công
+        if (data is Map<String, dynamic> && data.containsKey('token')) {
+          token = data['token'];
+        }
+        return data;
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+}
