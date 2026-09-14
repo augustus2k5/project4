@@ -14,5 +14,6 @@ class ApiConstants {
   }
 
   static String get registerUrl => '$baseUrl/auth/register';
+
   static String get loginUrl => '$baseUrl/auth/login';
 }

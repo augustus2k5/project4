@@ -72,19 +72,20 @@ class _BookingPageState extends State<BookingPage> {
 
       await showDialog<void>(
         context: context,
-        builder: (_) => AlertDialog(
-          title: const Text('Đặt lịch thành công'),
-          content: Text(
-            'Bạn đã đặt lịch với ${widget.doctor.name} '
-            'vào ngày ${dateValue()}, $slot.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Đồng ý'),
+        builder: (_) =>
+            AlertDialog(
+              title: const Text('Đặt lịch thành công'),
+              content: Text(
+                'Bạn đã đặt lịch với ${widget.doctor.name} '
+                    'vào ngày ${dateValue()}, $slot.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Đồng ý'),
+                ),
+              ],
             ),
-          ],
-        ),
       );
 
       if (mounted) Navigator.pop(context, true);
@@ -191,8 +192,8 @@ class _BookingPageState extends State<BookingPage> {
               child: _tile(
                 Icons.event_rounded,
                 '${date.day.toString().padLeft(2, '0')}/'
-                '${date.month.toString().padLeft(2, '0')}/'
-                '${date.year}',
+                    '${date.month.toString().padLeft(2, '0')}/'
+                    '${date.year}',
               ),
             ),
           ),
@@ -204,12 +205,13 @@ class _BookingPageState extends State<BookingPage> {
               runSpacing: 10,
               children: slots
                   .map(
-                    (s) => ChoiceChip(
+                    (s) =>
+                    ChoiceChip(
                       label: Text(s),
                       selected: slot == s,
                       onSelected: (_) => setState(() => slot = s),
                     ),
-                  )
+              )
                   .toList(),
             ),
           ),
@@ -244,20 +246,20 @@ class _BookingPageState extends State<BookingPage> {
               ),
               child: loading
                   ? const SizedBox(
-                      width: 22,
-                      height: 22,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
                   : const Text(
-                      'Xác nhận đặt lịch',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
+                'Xác nhận đặt lịch',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
             ),
           ),
         ],

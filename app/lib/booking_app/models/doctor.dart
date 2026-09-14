@@ -19,15 +19,20 @@ class Doctor {
   });
 
   factory Doctor.fromJson(Map<String, dynamic> j) {
-    final user = j['userId'] is Map ? Map<String, dynamic>.from(j['userId']) : <String, dynamic>{};
-    final spec = j['specialtyId'] is Map ? Map<String, dynamic>.from(j['specialtyId']) : <String, dynamic>{};
-    double numD(dynamic x) => x is num ? x.toDouble() : double.tryParse('$x') ?? 0;
+    final user = j['userId'] is Map ? Map<String, dynamic>.from(j['userId']) : <
+        String,
+        dynamic>{};
+    final spec = j['specialtyId'] is Map ? Map<String, dynamic>.from(
+        j['specialtyId']) : <String, dynamic>{};
+    double numD(dynamic x) =>
+        x is num ? x.toDouble() : double.tryParse('$x') ?? 0;
     int numI(dynamic x) => x is num ? x.toInt() : int.tryParse('$x') ?? 0;
     return Doctor(
       id: '${j['_id'] ?? j['id'] ?? ''}',
       name: '${user['fullName'] ?? j['name'] ?? 'Bác sĩ'}',
       specialty: '${spec['name'] ?? j['specialty'] ?? 'Chuyên khoa'}',
-      specialtyId: '${spec['_id'] ?? spec['id'] ?? (j['specialtyId'] is String ? j['specialtyId'] : '')}',
+      specialtyId: '${spec['_id'] ?? spec['id'] ??
+          (j['specialtyId'] is String ? j['specialtyId'] : '')}',
       rating: numD(j['rating'] ?? 5),
       patients: numI(j['patients'] ?? 0),
       price: numD(j['price'] ?? 0),
