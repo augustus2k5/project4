@@ -1,0 +1,88 @@
+import 'package:flutter/material.dart';
+import '../models/doctor.dart';
+import 'booking_page.dart';
+
+class DoctorDetailPage extends StatelessWidget {
+  final Doctor doctor;
+
+  const DoctorDetailPage({super.key, required this.doctor});
+
+  @override Widget build(BuildContext context) =>
+      Scaffold(backgroundColor: const Color(0xffF5FAFD),
+          appBar: AppBar(title: const Text('Thông tin bác sĩ'),
+              backgroundColor: Colors.transparent,
+              elevation: 0),
+          body: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 30), children: [
+            Container(padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(gradient: const LinearGradient(
+                    colors: [Color(0xff0284C7), Color(0xff38BDF8)]),
+                    borderRadius: BorderRadius.circular(28)),
+                child: Column(children: [
+                  Container(width: 92,
+                      height: 92,
+                      decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: .18),
+                          shape: BoxShape.circle),
+                      child: const Icon(
+                          Icons.person_rounded, color: Colors.white, size: 58)),
+                  const SizedBox(height: 14),
+                  Text(doctor.name, style: const TextStyle(color: Colors.white,
+                      fontSize: 23,
+                      fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 5),
+                  Text(doctor.specialty, style: const TextStyle(
+                      color: Colors.white70, fontSize: 15)),
+                  const SizedBox(height: 14),
+                  Row(mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                            Icons.star_rounded, color: Color(0xffffd166)),
+                        Text(' ${doctor.rating.toStringAsFixed(1)}',
+                            style: const TextStyle(color: Colors.white,
+                                fontWeight: FontWeight.w800)),
+                        const SizedBox(width: 20),
+                        Text('${doctor.experienceYears} năm kinh nghiệm',
+                            style: const TextStyle(color: Colors.white))
+                      ])
+                ])),
+            const SizedBox(height: 18),
+            _info('Giới thiệu', doctor.bio.isEmpty
+                ? 'Bác sĩ chưa cập nhật phần giới thiệu.'
+                : doctor.bio),
+            _info('Liên hệ',
+                doctor.phone.isEmpty ? 'Chưa cập nhật số điện thoại' : doctor
+                    .phone),
+            _info('Email',
+                doctor.email.isEmpty ? 'Chưa cập nhật email' : doctor.email),
+            if(doctor.price > 0) _info(
+                'Chi phí khám', '${doctor.price.toStringAsFixed(0)} đ'),
+            const SizedBox(height: 8),
+            SizedBox(height: 54,
+                child: ElevatedButton.icon(onPressed: () =>
+                    Navigator.push(context, MaterialPageRoute(
+                        builder: (_) => BookingPage(doctor: doctor))),
+                    icon: const Icon(Icons.calendar_month_rounded),
+                    label: const Text('Đặt lịch với bác sĩ', style: TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w800)),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xff0284C7),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(17)))))
+          ]));
+
+  Widget _info(String t, String v) =>
+      Container(margin: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+              color: Colors.white, borderRadius: BorderRadius.circular(18)),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(t, style: const TextStyle(
+                    fontWeight: FontWeight.w800, fontSize: 15)),
+                const SizedBox(height: 7),
+                Text(v, style: const TextStyle(
+                    color: Color(0xff64748B), height: 1.45))
+              ]));
+}

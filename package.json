@@ -1,0 +1,9 @@
+{
+  "name": "project4-root",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "npm --prefix backend run dev",
+    "start": "npm --prefix backend start",
+    "seed:admin": "npm --prefix backend run seed:admin"
+  }
+}

@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../models/user_model.dart';
 import '../models/specialty_model.dart';
 import 'token_manager.dart';
+
 class ApiService {
   // =========================
   // BASE URL
@@ -28,13 +29,8 @@ class ApiService {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/login'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-        }),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'password': password}),
       );
 
       final data = jsonDecode(response.body);
@@ -53,10 +49,7 @@ class ApiService {
         'message': data['message'] ?? 'Đăng nhập thất bại',
       };
     } catch (e) {
-      return {
-        'success': false,
-        'message': 'Không thể kết nối đến máy chủ',
-      };
+      return {'success': false, 'message': 'Không thể kết nối đến máy chủ'};
     }
   }
 
