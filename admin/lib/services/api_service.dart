@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../models/user_model.dart';
 import '../models/specialty_model.dart';
 import 'token_manager.dart';
+
 class ApiService {
   // =========================
   // BASE URL
@@ -28,13 +29,8 @@ class ApiService {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/login'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-        }),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'password': password}),
       );
 
       final data = jsonDecode(response.body);
@@ -53,10 +49,7 @@ class ApiService {
         'message': data['message'] ?? 'Đăng nhập thất bại',
       };
     } catch (e) {
-      return {
-        'success': false,
-        'message': 'Không thể kết nối đến máy chủ',
-      };
+      return {'success': false, 'message': 'Không thể kết nối đến máy chủ'};
     }
   }
 
@@ -226,6 +219,45 @@ class ApiService {
       },
     );
 
+    return response.statusCode == 200;
+  }
+
+  // ============================================================
+  // LẤY TẤT CẢ LỊCH HẸN
+  // GET /api/appointments
+  // ============================================================
+  static Future<List<dynamic>> getAppointments() async {
+    final token = await TokenManager.getToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/appointments'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+    throw Exception('Không thể tải danh sách lịch hẹn');
+  }
+
+  // ============================================================
+  // CẬP NHẬT TRẠNG THÁI LỊCH HẸN
+  // PATCH /api/appointments/:id/status
+  // ============================================================
+  static Future<bool> updateAppointmentStatus({
+    required String id,
+    required String status,
+  }) async {
+    final token = await TokenManager.getToken();
+    final response = await http.patch(
+      Uri.parse('$baseUrl/appointments/$id/status'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'status': status}),
+    );
     return response.statusCode == 200;
   }
 }

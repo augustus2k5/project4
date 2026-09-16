@@ -1,26 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-// import 'screens/admin/admin_dashboard.dart';
+import 'features/auth/providers/auth_provider.dart';
+import 'booking_app/screens/login_page.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const BookingApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class BookingApp extends StatelessWidget {
+  const BookingApp({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [], // Để trống danh sách provider tạm thời
-      child: const MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: Text('App đang phát triển'),
-          ),
-        ),
-      ),
-    );
-  }
+  @override Widget build(BuildContext context) =>
+      ChangeNotifierProvider(create: (_) => AuthProvider(),
+          child: MaterialApp(debugShowCheckedModeBanner: false,
+              title: 'HealthCare Booking',
+              theme: ThemeData(useMaterial3: true,
+                  fontFamily: 'Arial',
+                  colorScheme: ColorScheme.fromSeed(
+                      seedColor: const Color(0xff0284C7)),
+                  scaffoldBackgroundColor: const Color(0xffF5FAFD)),
+              home: const BookingLoginPage()));
 }

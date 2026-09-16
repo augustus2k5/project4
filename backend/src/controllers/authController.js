@@ -47,42 +47,27 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    // Tìm tài khoản
+    // 1. Tìm tài khoản theo email
     const user = await User.findOne({ email });
-
     if (!user) {
       return res.status(400).json({
         message: 'Email hoặc mật khẩu không đúng!'
       });
     }
-
-    // Kiểm tra trạng thái tài khoản
+    // 2. Kiểm tra trạng thái tài khoản
     if (user.status !== 'ACTIVE') {
       return res.status(403).json({
         message: 'Tài khoản của bạn đã bị khóa hoặc ngừng hoạt động!'
       });
     }
-
-    // Kiểm tra mật khẩu
+    // 3. Kiểm tra mật khẩu
     const isMatch = await bcrypt.compare(password, user.password);
-
     if (!isMatch) {
       return res.status(400).json({
         message: 'Email hoặc mật khẩu không đúng!'
       });
     }
-
-    // ==============================
-    // CHỈ CHO ADMIN ĐĂNG NHẬP
-    // ==============================
-    if (user.role !== 'ADMIN') {
-      return res.status(403).json({
-        message: 'Chỉ tài khoản ADMIN mới được đăng nhập vào trang quản trị!'
-      });
-    }
-
-    // Tạo JWT
+    // 4. Tạo JWT Token
     const token = jwt.sign(
       {
         id: user._id,
@@ -93,19 +78,19 @@ exports.login = async (req, res) => {
         expiresIn: '7d'
       }
     );
-
-    // Trả kết quả
+    // 5. Trả kết quả cho Client (hỗ trợ cả PATIENT, DOCTOR, ADMIN)
     res.status(200).json({
-      message: 'Đăng nhập Admin thành công!',
+      message: 'Đăng nhập thành công!',
       token,
       user: {
         id: user._id,
         fullName: user.fullName,
         email: user.email,
-        role: user.role
+        phoneNumber: user.phoneNumber || '',
+        role: user.role,
+        status: user.status
       }
     });
-
   } catch (error) {
     res.status(500).json({
       message: error.message
