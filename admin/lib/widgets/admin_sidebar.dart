@@ -1,3 +1,4 @@
+import 'package:app/services/token_manager.dart';
 import 'package:flutter/material.dart';
 import '../screens/admin/login/login_screen.dart';
 
@@ -28,11 +29,7 @@ class AdminSidebar extends StatelessWidget {
             child: const Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.local_hospital,
-                  color: Colors.white,
-                  size: 35,
-                ),
+                Icon(Icons.local_hospital, color: Colors.white, size: 35),
                 SizedBox(height: 5),
                 Text(
                   'MEDICAL ADMIN',
@@ -46,63 +43,37 @@ class AdminSidebar extends StatelessWidget {
             ),
           ),
 
-          const Divider(
-            color: Colors.white24,
-          ),
+          const Divider(color: Colors.white24),
 
           // ============================================================
           // DASHBOARD
           // ============================================================
-          _menuItem(
-            icon: Icons.dashboard,
-            title: 'Dashboard',
-            index: 0,
-          ),
+          _menuItem(icon: Icons.dashboard, title: 'Dashboard', index: 0),
 
           // ============================================================
           // NGƯỜI DÙNG
           // ============================================================
-          _menuItem(
-            icon: Icons.people,
-            title: 'Người dùng',
-            index: 1,
-          ),
+          _menuItem(icon: Icons.people, title: 'Người dùng', index: 1),
 
           // ============================================================
           // BÁC SĨ
           // ============================================================
-          _menuItem(
-            icon: Icons.medical_services,
-            title: 'Bác sĩ',
-            index: 2,
-          ),
+          _menuItem(icon: Icons.medical_services, title: 'Bác sĩ', index: 2),
 
           // ============================================================
           // CHUYÊN KHOA
           // ============================================================
-          _menuItem(
-            icon: Icons.local_hospital,
-            title: 'Chuyên khoa',
-            index: 3,
-          ),
+          _menuItem(icon: Icons.local_hospital, title: 'Chuyên khoa', index: 3),
 
           // ============================================================
           // BỆNH NHÂN
           // ============================================================
-          _menuItem(
-            icon: Icons.personal_injury,
-            title: 'Bệnh nhân',
-            index: 4,
-          ),
+          _menuItem(icon: Icons.personal_injury, title: 'Bệnh nhân', index: 4),
 
           // ============================================================
           // LỊCH HẸN
           // ============================================================
-          _menuItem(
-            icon: Icons.calendar_month,
-            title: 'Lịch hẹn',
-            index: 5,
-          ),
+          _menuItem(icon: Icons.calendar_month, title: 'Lịch hẹn', index: 5),
 
           const Spacer(),
 
@@ -113,7 +84,9 @@ class AdminSidebar extends StatelessWidget {
             icon: Icons.logout,
             title: 'Đăng xuất',
             index: 6,
-            onLogout: () {
+            onLogout: () async {
+              await TokenManager.removeToken();
+              if (!context.mounted) return;
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
@@ -152,14 +125,8 @@ class AdminSidebar extends StatelessWidget {
         onItemSelected(index);
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(
-          horizontal: 10,
-          vertical: 4,
-        ),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 15,
-          vertical: 14,
-        ),
+        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
         decoration: BoxDecoration(
           color: selected
               ? Colors.white.withValues(alpha: 0.18)
@@ -168,20 +135,13 @@ class AdminSidebar extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: Colors.white,
-              size: 22,
-            ),
+            Icon(icon, color: Colors.white, size: 22),
 
             const SizedBox(width: 15),
 
             Text(
               title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-              ),
+              style: const TextStyle(color: Colors.white, fontSize: 15),
             ),
           ],
         ),

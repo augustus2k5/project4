@@ -221,4 +221,43 @@ class ApiService {
 
     return response.statusCode == 200;
   }
+
+  // ============================================================
+  // LẤY TẤT CẢ LỊCH HẸN
+  // GET /api/appointments
+  // ============================================================
+  static Future<List<dynamic>> getAppointments() async {
+    final token = await TokenManager.getToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/appointments'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+    throw Exception('Không thể tải danh sách lịch hẹn');
+  }
+
+  // ============================================================
+  // CẬP NHẬT TRẠNG THÁI LỊCH HẸN
+  // PATCH /api/appointments/:id/status
+  // ============================================================
+  static Future<bool> updateAppointmentStatus({
+    required String id,
+    required String status,
+  }) async {
+    final token = await TokenManager.getToken();
+    final response = await http.patch(
+      Uri.parse('$baseUrl/appointments/$id/status'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'status': status}),
+    );
+    return response.statusCode == 200;
+  }
 }
