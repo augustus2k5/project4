@@ -1,0 +1,25 @@
+# Node.js
+backend/node_modules/
+backend/.env
+
+# Flutter
+app/.dart_tool/
+app/build/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+
+admin/.dart_tool/
+admin/build/
+admin/.flutter-plugins
+admin/.flutter-plugins-dependencies
+
+# Environment
+.env
+*.env
+
+# IDE
+.vscode/
+.idea/
+
+# Windows
+Thumbs.db
