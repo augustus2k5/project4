@@ -5,18 +5,31 @@ exports.createAppointment = async (req, res) => {
   try {
     const { patientId, doctorId, date, timeSlot, reason } = req.body;
 
-    
-    const existingAppointment = await Appointment.findOne({
+    // 1. Kiểm tra Bác sĩ đã có lịch chưa
+    const doctorBusy = await Appointment.findOne({
       doctorId,
       date,
       timeSlot,
       status: { $ne: 'CANCELLED' } 
     });
 
-    if (existingAppointment) {
+    if (doctorBusy) {
       return res.status(400).json({ message: 'Bác sĩ đã có lịch hẹn vào khung giờ này!' });
     }
 
+    // 2. (Mới) Kiểm tra Bệnh nhân có bị trùng giờ khám khác không
+    const patientBusy = await Appointment.findOne({
+      patientId,
+      date,
+      timeSlot,
+      status: { $ne: 'CANCELLED' }
+    });
+
+    if (patientBusy) {
+      return res.status(400).json({ message: 'Bạn đã có một lịch khám khác vào khung giờ này!' });
+    }
+
+    // 3. Tạo lịch mới
     const appointment = new Appointment({
       patientId,
       doctorId,
