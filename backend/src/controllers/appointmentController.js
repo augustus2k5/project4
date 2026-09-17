@@ -73,21 +73,3 @@ exports.updateAppointmentStatus = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-// lấy toàn bộ AllAppointments
-exports.getAllAppointments = async (req, res) => {
-  try {
-    const appointments = await Appointment.find()
-      .populate('patientId', 'fullName email phoneNumber')
-      .populate({
-        path: 'doctorId',
-        populate: [
-          { path: 'userId', select: 'fullName email phoneNumber' },
-          { path: 'specialtyId', select: 'name' }
-        ]
-      })
-      .sort({ createdAt: -1 });
-    res.status(200).json(appointments);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
