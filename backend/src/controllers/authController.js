@@ -76,11 +76,11 @@ exports.login = async (req, res) => {
     // ==============================
     // CHỈ CHO ADMIN ĐĂNG NHẬP
     // ==============================
-    if (user.role !== 'ADMIN') {
-      return res.status(403).json({
-        message: 'Chỉ tài khoản ADMIN mới được đăng nhập vào trang quản trị!'
-      });
-    }
+    // if (user.role !== 'ADMIN') {
+    //   return res.status(403).json({
+    //     message: 'Chỉ tài khoản ADMIN mới được đăng nhập vào trang quản trị!'
+    //   });
+    // }
 
     // Tạo JWT
     const token = jwt.sign(
