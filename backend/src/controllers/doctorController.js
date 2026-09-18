@@ -1,5 +1,6 @@
 const Doctor = require('../models/Doctor');
 const User = require('../models/User');
+const Appointment = require('../models/Appointment');
 
 exports.createDoctor = async (req, res) => {
   try {
@@ -43,6 +44,24 @@ exports.getDoctorsBySpecialty = async (req, res) => {
       .populate('userId', 'fullName email phoneNumber')
       .populate('specialtyId', 'name iconUrl');
     res.json(doctors);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getMyAppointments = async (req, res) => {
+  try {
+    const doctor = await Doctor.findOne({ userId: req.user.id });
+    if (!doctor) {
+      return res.status(404).json({ message: 'Không tìm thấy thông tin Bác sĩ!' });
+    }
+
+
+    const appointments = await Appointment.find({ doctorId: doctor._id })
+      .populate('patientId', 'fullName email phone') 
+      .sort({ date: 1, timeSlot: 1 });
+
+    res.status(200).json(appointments);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
