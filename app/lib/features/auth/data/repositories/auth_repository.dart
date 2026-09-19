@@ -80,4 +80,52 @@ class AuthRepository {
       };
     }
   }
+
+  /// Hàm cập nhật thông tin cá nhân
+  Future<Map<String, dynamic>> updateProfile({
+    required String fullName,
+    required String email,
+    required String phoneNumber,
+    required String currentPassword,
+    String? newPassword,
+    String? avatar,
+    required String token,
+  }) async {
+    try {
+      final response = await http.put(
+        Uri.parse('${ApiConstants.baseUrl}/users/profile'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'fullName': fullName,
+          'email': email,
+          'phoneNumber': phoneNumber,
+          'currentPassword': currentPassword,
+          if (newPassword != null && newPassword.isNotEmpty)
+            'newPassword': newPassword,
+          if (avatar != null) 'avatar': avatar,
+        }),
+      );
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': data['message'] ?? 'Cập nhật thành công!',
+          'user': data['user'],
+        };
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Cập nhật thất bại!',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Không thể kết nối đến máy chủ. Vui lòng thử lại!',
+      };
+    }
+  }
 }
