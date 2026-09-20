@@ -1,11 +1,16 @@
 const MedicalRecord = require('../models/MedicalRecord');
 const Appointment = require('../models/Appointment');
+const Doctor = require('../models/Doctor');
 
 exports.createMedicalRecord = async (req, res) => {
   try {
-    const { appointmentId, patientId, doctorId, diagnosis, notes, prescriptions } = req.body;
+    const { appointmentId, patientId, diagnosis, notes, prescriptions } = req.body;
 
-    // Kiểm tra xem lịch hẹn đã tạo bệnh án chưa
+    const doctor = await Doctor.findOne({ userId: req.user.id });
+    if (!doctor) {
+      return res.status(404).json({ message: 'Không tìm thấy thông tin Bác sĩ!' });
+    }
+
     const existingRecord = await MedicalRecord.findOne({ appointmentId });
     if (existingRecord) {
       return res.status(400).json({ message: 'Lịch hẹn này đã có hồ sơ bệnh án!' });
@@ -14,7 +19,7 @@ exports.createMedicalRecord = async (req, res) => {
     const record = new MedicalRecord({
       appointmentId,
       patientId,
-      doctorId,
+      doctorId: doctor._id, 
       diagnosis,
       notes,
       prescriptions
@@ -22,7 +27,6 @@ exports.createMedicalRecord = async (req, res) => {
 
     await record.save();
 
-    // Tự động chuyển trạng thái Lịch hẹn thành COMPLETED
     await Appointment.findByIdAndUpdate(appointmentId, { status: 'COMPLETED' });
 
     res.status(201).json({ message: 'Tạo hồ sơ bệnh án thành công!', record });
