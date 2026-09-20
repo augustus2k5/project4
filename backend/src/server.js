@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
+const path = require('path');
 
 dotenv.config();
 
@@ -23,6 +24,9 @@ app.use(
   require('./routes/specialtyRoutes')
 );
 
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+app.use('/api/upload', require('./routes/uploadRoutes'));
 
 app.use(
   '/api/doctors',
