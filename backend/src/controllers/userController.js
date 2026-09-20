@@ -103,18 +103,12 @@ const changePassword = async (req, res) => {
     user.password = await bcrypt.hash(newPassword, salt);
     await user.save();
     res.status(200).json({ message: "Đổi mật khẩu thành công!" });
-  } catch (error) {
+  }  catch (error) {
     res.status(500).json({ message: error.message });
-        role: user.role,
-        status: user.status
-      }
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: error.message || "Lỗi khi cập nhật hồ sơ!" });
-
   }
-};
+    };
+
+
 
 
 module.exports = {
