@@ -21,7 +21,9 @@ const updateProfile = async (req, res) => {
   try {
     const userId = req.user.id; // Lấy ID từ Token
     const { fullName, email, phoneNumber, currentPassword, newPassword, avatar } = req.body;
+
     // Bắt buộc phải có mật khẩu hiện tại
+
     if (!currentPassword) {
       return res.status(400).json({ message: "Vui lòng nhập mật khẩu hiện tại để xác nhận thay đổi!" });
     }
@@ -30,19 +32,25 @@ const updateProfile = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "Không tìm thấy người dùng!" });
     }
+
     // Kiểm tra mật khẩu hiện tại
+
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Mật khẩu hiện tại không chính xác!" });
     }
+
     // Nếu người dùng đổi Email -> Kiểm tra xem email mới đã có ai dùng chưa
+
     if (email && email.toLowerCase() !== user.email) {
       const emailExists = await User.findOne({ 
         email: email.toLowerCase(), 
         _id: { $ne: userId } 
       });
       if (emailExists) {
+
         return res.status(400).json({ message: "Email mới này đã được người khác sử dụng!" });
+
       }
       user.email = email.toLowerCase();
     }
@@ -50,7 +58,9 @@ const updateProfile = async (req, res) => {
     if (fullName) user.fullName = fullName;
     if (phoneNumber !== undefined) user.phoneNumber = phoneNumber;
     if (avatar !== undefined) user.avatar = avatar;
+
     // Nếu người dùng đổi mật khẩu mới
+
     if (newPassword && newPassword.trim().length > 0) {
       if (newPassword.length < 6) {
         return res.status(400).json({ message: "Mật khẩu mới phải có tối thiểu 6 ký tự!" });
@@ -71,35 +81,28 @@ const updateProfile = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Lỗi updateProfile:", error);
+    res.status(500).json({ message: error.message || "Lỗi khi cập nhật hồ sơ!" });
   }
 };
-
 const changePassword = async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
-
     if (!oldPassword || !newPassword) {
-      return res.status(400).json({ message: 'Vui lòng nhập mật khẩu cũ và mật khẩu mới!' });
+      return res.status(400).json({ message: "Vui lòng nhập mật khẩu cũ và mật khẩu mới!" });
     }
-
     const user = await User.findById(req.user.id);
     if (!user) {
-      return res.status(404).json({ message: 'Không tìm thấy người dùng!' });
+      return res.status(404).json({ message: "Không tìm thấy người dùng!" });
     }
-
-   
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Mật khẩu cũ không chính xác!' });
+      return res.status(400).json({ message: "Mật khẩu cũ không chính xác!" });
     }
-
-    
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(newPassword, salt);
     await user.save();
-
-    res.status(200).json({ message: 'Đổi mật khẩu thành công!' });
+    res.status(200).json({ message: "Đổi mật khẩu thành công!" });
   } catch (error) {
     res.status(500).json({ message: error.message });
         role: user.role,
@@ -109,8 +112,10 @@ const changePassword = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message || "Lỗi khi cập nhật hồ sơ!" });
+
   }
 };
+
 
 module.exports = {
     getUsers,
