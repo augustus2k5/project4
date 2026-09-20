@@ -5,31 +5,18 @@ exports.createAppointment = async (req, res) => {
   try {
     const { patientId, doctorId, date, timeSlot, reason } = req.body;
 
-    // 1. Kiểm tra Bác sĩ đã có lịch chưa
-    const doctorBusy = await Appointment.findOne({
+    
+    const existingAppointment = await Appointment.findOne({
       doctorId,
       date,
       timeSlot,
       status: { $ne: 'CANCELLED' } 
     });
 
-    if (doctorBusy) {
+    if (existingAppointment) {
       return res.status(400).json({ message: 'Bác sĩ đã có lịch hẹn vào khung giờ này!' });
     }
 
-    // 2. (Mới) Kiểm tra Bệnh nhân có bị trùng giờ khám khác không
-    const patientBusy = await Appointment.findOne({
-      patientId,
-      date,
-      timeSlot,
-      status: { $ne: 'CANCELLED' }
-    });
-
-    if (patientBusy) {
-      return res.status(400).json({ message: 'Bạn đã có một lịch khám khác vào khung giờ này!' });
-    }
-
-    // 3. Tạo lịch mới
     const appointment = new Appointment({
       patientId,
       doctorId,
@@ -82,6 +69,24 @@ exports.updateAppointmentStatus = async (req, res) => {
     }
 
     res.json({ message: 'Cập nhật trạng thái thành công!', appointment });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+// lấy toàn bộ AllAppointments
+exports.getAllAppointments = async (req, res) => {
+  try {
+    const appointments = await Appointment.find()
+      .populate('patientId', 'fullName email phoneNumber')
+      .populate({
+        path: 'doctorId',
+        populate: [
+          { path: 'userId', select: 'fullName email phoneNumber' },
+          { path: 'specialtyId', select: 'name' }
+        ]
+      })
+      .sort({ createdAt: -1 });
+    res.status(200).json(appointments);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

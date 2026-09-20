@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema({
   },
   password: { type: String, required: true },
   phoneNumber: { type: String, default: '' },
+  avatar:{type:String , default:""},
   role: { 
     type: String, 
     enum: ['PATIENT', 'DOCTOR', 'ADMIN'], 
