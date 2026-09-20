@@ -1,5 +1,6 @@
 const User = require("../models/User");
 
+
 const bcrypt = require('bcryptjs');
 
 
@@ -22,6 +23,7 @@ const updateProfile = async (req, res) => {
   try {
     const userId = req.user.id; // Lấy ID từ Token
     const { fullName, email, phoneNumber, currentPassword, newPassword, avatar } = req.body;
+
     // Bắt buộc phải có mật khẩu hiện tại để xác nhận bảo mật
     if (!currentPassword) {
       return res.status(400).json({ message: "Vui lòng nhập mật khẩu hiện tại để xác nhận thay đổi!" });
@@ -32,18 +34,23 @@ const updateProfile = async (req, res) => {
       return res.status(404).json({ message: "Không tìm thấy người dùng!" });
     }
     // Kiểm tra mật khẩu hiện tại có đúng không
+
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Mật khẩu hiện tại không chính xác!" });
     }
+
     // Nếu người dùng đổi Email -> Kiểm tra xem email mới đã bị ai dùng chưa
+
     if (email && email.toLowerCase() !== user.email) {
       const emailExists = await User.findOne({ 
         email: email.toLowerCase(), 
         _id: { $ne: userId } 
       });
       if (emailExists) {
+
         return res.status(400).json({ message: "Email này đã được người khác sử dụng!" });
+
       }
       user.email = email.toLowerCase();
     }
@@ -51,7 +58,9 @@ const updateProfile = async (req, res) => {
     if (fullName) user.fullName = fullName;
     if (phoneNumber !== undefined) user.phoneNumber = phoneNumber;
     if (avatar !== undefined) user.avatar = avatar;
+
     // NẾU CÓ ĐỔI MẬT KHẨU MỚI -> Mã hóa và lưu vào Database
+
     if (newPassword && newPassword.trim().length > 0) {
       if (newPassword.length < 6) {
         return res.status(400).json({ message: "Mật khẩu mới phải có tối thiểu 6 ký tự!" });
@@ -94,10 +103,15 @@ const changePassword = async (req, res) => {
     user.password = await bcrypt.hash(newPassword, salt);
     await user.save();
     res.status(200).json({ message: "Đổi mật khẩu thành công!" });
+
   } catch (error) {
+
     res.status(500).json({ message: error.message });
   }
-};
+    };
+
+
+
 
 
 module.exports = {
@@ -105,4 +119,5 @@ module.exports = {
 
     updateProfile,
     changePassword
+
 };
