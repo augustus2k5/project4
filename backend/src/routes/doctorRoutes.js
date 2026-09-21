@@ -1,24 +1,71 @@
 const express = require('express');
+
 const router = express.Router();
 
-const { 
-  createDoctor, 
-  getAllDoctors, 
+const {
+  createDoctor,
+  getAllDoctors,
   getDoctorsBySpecialty,
-  getMyAppointments,    
-  // updateWorkingHours
+  getDoctorById,
+  updateDoctor,
+  deleteDoctor
 } = require('../controllers/doctorController');
 
+const {
+  verifyToken,
+  authorizeRoles
+} = require('../middleware/authMiddleware');
 
-const { verifyToken, authorizeRoles } = require('../middleware/authMiddleware');
+
+// GET tất cả bác sĩ
+router.get(
+  '/',
+  verifyToken,
+  getAllDoctors
+);
 
 
-router.get('/', getAllDoctors);
-router.get('/specialty/:specialtyId', getDoctorsBySpecialty);
+// GET bác sĩ theo chuyên khoa
+router.get(
+  '/specialty/:specialtyId',
+  verifyToken,
+  getDoctorsBySpecialty
+);
 
-router.get('/my-appointments', verifyToken, authorizeRoles('DOCTOR'), getMyAppointments);
-// router.post('/working-hours', verifyToken, authorizeRoles('DOCTOR'), updateWorkingHours);
 
-router.post('/', verifyToken, authorizeRoles('ADMIN'), createDoctor);
+// GET chi tiết bác sĩ
+router.get(
+  '/:id',
+  verifyToken,
+  getDoctorById
+);
+
+
+// POST thêm bác sĩ
+router.post(
+  '/',
+  verifyToken,
+  authorizeRoles('ADMIN'),
+  createDoctor
+);
+
+
+// PUT sửa bác sĩ
+router.put(
+  '/:id',
+  verifyToken,
+  authorizeRoles('ADMIN'),
+  updateDoctor
+);
+
+
+// DELETE xóa bác sĩ
+router.delete(
+  '/:id',
+  verifyToken,
+  authorizeRoles('ADMIN'),
+  deleteDoctor
+);
+
 
 module.exports = router;

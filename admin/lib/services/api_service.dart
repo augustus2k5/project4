@@ -260,4 +260,325 @@ class ApiService {
     );
     return response.statusCode == 200;
   }
+  static Future<List<dynamic>> getDoctors() async {
+    final token = await TokenManager.getToken();
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/doctors'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty)
+          'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      if (data is List) {
+        return data;
+      }
+
+      throw Exception(
+        'Dữ liệu bác sĩ không hợp lệ',
+      );
+    }
+
+    String message =
+        'Không thể lấy danh sách bác sĩ';
+
+    try {
+      final data = jsonDecode(response.body);
+
+      if (data is Map &&
+          data['message'] != null) {
+        message = data['message'].toString();
+      }
+    } catch (_) {}
+
+    throw Exception(
+      '$message (${response.statusCode})',
+    );
+  }
+
+  // ------------------------------------------------------------
+  // THÊM BÁC SĨ
+  // POST /api/doctors
+  // ------------------------------------------------------------
+
+  static Future<bool> createDoctor({
+    required String userId,
+    required String specialtyId,
+    required double price,
+    required String bio,
+    required int experienceYears,
+  }) async {
+    final token = await TokenManager.getToken();
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/doctors'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty)
+          'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'userId': userId,
+        'specialtyId': specialtyId,
+        'price': price,
+        'bio': bio,
+        'experienceYears': experienceYears,
+      }),
+    );
+
+    if (response.statusCode == 200 ||
+        response.statusCode == 201) {
+      return true;
+    }
+
+    String message =
+        'Không thể thêm bác sĩ';
+
+    try {
+      final data = jsonDecode(response.body);
+
+      if (data is Map &&
+          data['message'] != null) {
+        message = data['message'].toString();
+      }
+    } catch (_) {}
+
+    throw Exception(
+      '$message (${response.statusCode})',
+    );
+  }
+
+  // ------------------------------------------------------------
+  // SỬA BÁC SĨ
+  // PUT /api/doctors/:id
+  // ------------------------------------------------------------
+
+  static Future<bool> updateDoctor({
+    required String id,
+    required String specialtyId,
+    required double price,
+    required String bio,
+    required int experienceYears,
+  }) async {
+    final token = await TokenManager.getToken();
+
+    // Kiểm tra ID trước khi gọi API
+    final doctorId = id.trim();
+
+    if (doctorId.isEmpty) {
+      throw Exception(
+        'ID bác sĩ không hợp lệ',
+      );
+    }
+
+    final url = '$baseUrl/doctors/$doctorId';
+
+    // In thông tin để kiểm tra khi chạy Flutter
+    print('========================================');
+    print('UPDATE DOCTOR');
+    print('URL: $url');
+    print('METHOD: PUT');
+    print('ID: $doctorId');
+    print('SPECIALTY: $specialtyId');
+    print('PRICE: $price');
+    print('EXPERIENCE: $experienceYears');
+    print('========================================');
+
+    try {
+      final response = await http.put(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null && token.isNotEmpty)
+            'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'specialtyId': specialtyId,
+          'price': price,
+          'bio': bio,
+          'experienceYears': experienceYears,
+        }),
+      );
+
+      // In response để kiểm tra lỗi
+      print('========================================');
+      print('UPDATE DOCTOR RESPONSE');
+      print('STATUS: ${response.statusCode}');
+      print('BODY: ${response.body}');
+      print('========================================');
+
+      // HTTP 2xx = thành công
+      if (response.statusCode >= 200 &&
+          response.statusCode < 300) {
+        return true;
+      }
+
+      String message =
+          'Cập nhật bác sĩ thất bại';
+
+      // Cố gắng lấy message từ backend
+      try {
+        final data = jsonDecode(response.body);
+
+        if (data is Map &&
+            data['message'] != null) {
+          message =
+              data['message'].toString();
+        } else if (data is Map &&
+            data['error'] != null) {
+          message =
+              data['error'].toString();
+        }
+      } catch (_) {
+        if (response.body.isNotEmpty) {
+          message = response.body;
+        }
+      }
+
+      // Trường hợp 404
+      if (response.statusCode == 404) {
+        throw Exception(
+          'Không tìm thấy API cập nhật bác sĩ.\n'
+          'URL: $url\n'
+          'Backend trả về 404.',
+        );
+      }
+
+      // Trường hợp 401
+      if (response.statusCode == 401) {
+        throw Exception(
+          'Phiên đăng nhập đã hết hạn '
+          'hoặc token không hợp lệ.',
+        );
+      }
+
+      // Trường hợp 403
+      if (response.statusCode == 403) {
+        throw Exception(
+          'Bạn không có quyền cập nhật bác sĩ.',
+        );
+      }
+
+      // Trường hợp 400
+      if (response.statusCode == 400) {
+        throw Exception(
+          '$message\nDữ liệu gửi lên không hợp lệ.',
+        );
+      }
+
+      // Các lỗi khác
+      throw Exception(
+        '$message (${response.statusCode})',
+      );
+    } catch (e) {
+      if (e is Exception) {
+        rethrow;
+      }
+
+      throw Exception(
+        'Không thể kết nối đến máy chủ: $e',
+      );
+    }
+  }
+
+  // ------------------------------------------------------------
+  // XÓA BÁC SĨ
+  // DELETE /api/doctors/:id
+  // ------------------------------------------------------------
+// ------------------------------------------------------------
+// XEM CHI TIẾT BÁC SĨ
+// GET /api/doctors/:id
+// ------------------------------------------------------------
+
+static Future<Map<String, dynamic>> getDoctorById(
+  String id,
+) async {
+  final token = await TokenManager.getToken();
+
+  final response = await http.get(
+    Uri.parse('$baseUrl/doctors/$id'),
+    headers: {
+      'Content-Type': 'application/json',
+      if (token != null)
+        'Authorization': 'Bearer $token',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+
+    if (data is Map) {
+      return Map<String, dynamic>.from(data);
+    }
+
+    throw Exception(
+      'Dữ liệu bác sĩ không hợp lệ',
+    );
+  }
+
+  String message =
+      'Không thể lấy thông tin bác sĩ';
+
+  try {
+    final data = jsonDecode(response.body);
+
+    if (data is Map &&
+        data['message'] != null) {
+      message = data['message'].toString();
+    }
+  } catch (_) {}
+
+  throw Exception(
+    '$message (${response.statusCode})',
+  );
+}
+
+  static Future<bool> deleteDoctor(
+    String id,
+  ) async {
+    final token = await TokenManager.getToken();
+
+    final doctorId = id.trim();
+
+    if (doctorId.isEmpty) {
+      throw Exception(
+        'ID bác sĩ không hợp lệ',
+      );
+    }
+
+    final response = await http.delete(
+      Uri.parse('$baseUrl/doctors/$doctorId'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty)
+          'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    }
+
+    String message =
+        'Không thể xóa bác sĩ';
+
+    try {
+      final data = jsonDecode(response.body);
+
+      if (data is Map &&
+          data['message'] != null) {
+        message =
+            data['message'].toString();
+      }
+    } catch (_) {}
+
+    throw Exception(
+      '$message (${response.statusCode})',
+    );
+  }
 }
