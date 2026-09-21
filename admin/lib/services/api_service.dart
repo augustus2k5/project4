@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
+import '../models/patient_model.dart'; // Thay đổi đường dẫn đúng với thư mục chứa PatientModel của bạn
 import '../models/user_model.dart';
 import '../models/specialty_model.dart';
 import 'token_manager.dart';
@@ -566,6 +566,231 @@ static Future<Map<String, dynamic>> getDoctorById(
 
     String message =
         'Không thể xóa bác sĩ';
+
+    try {
+      final data = jsonDecode(response.body);
+
+      if (data is Map &&
+          data['message'] != null) {
+        message =
+            data['message'].toString();
+      }
+    } catch (_) {}
+
+    throw Exception(
+      '$message (${response.statusCode})',
+    );
+  }
+  static Future<List<PatientModel>> getPatients() async {
+    final token = await TokenManager.getToken();
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/patients'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty)
+          'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      if (data is! List) {
+        throw Exception(
+          'Dữ liệu bệnh nhân không hợp lệ',
+        );
+      }
+
+      return data
+          .map(
+            (json) => PatientModel.fromJson(
+              Map<String, dynamic>.from(json),
+            ),
+          )
+          .toList();
+    }
+
+    String message =
+        'Không thể lấy danh sách bệnh nhân';
+
+    try {
+      final data = jsonDecode(response.body);
+
+      if (data is Map &&
+          data['message'] != null) {
+        message =
+            data['message'].toString();
+      }
+    } catch (_) {}
+
+    throw Exception(
+      '$message (${response.statusCode})',
+    );
+  }
+
+  // ------------------------------------------------------------
+  // THÊM BỆNH NHÂN
+  // POST /api/patients
+  // ------------------------------------------------------------
+
+  static Future<bool> createPatient({
+    required String userId,
+    required String patientCode,
+    String? dateOfBirth,
+    required String gender,
+    required String identityCard,
+    required String address,
+    required String medicalHistory,
+    required String allergies,
+  }) async {
+    final token = await TokenManager.getToken();
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/patients'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty)
+          'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'userId': userId,
+        'patientCode': patientCode,
+        'dateOfBirth': dateOfBirth,
+        'gender': gender,
+        'identityCard': identityCard,
+        'address': address,
+        'medicalHistory': medicalHistory,
+        'allergies': allergies,
+      }),
+    );
+
+    if (response.statusCode == 200 ||
+        response.statusCode == 201) {
+      return true;
+    }
+
+    String message =
+        'Không thể thêm hồ sơ bệnh nhân';
+
+    try {
+      final data = jsonDecode(response.body);
+
+      if (data is Map &&
+          data['message'] != null) {
+        message =
+            data['message'].toString();
+      }
+    } catch (_) {}
+
+    throw Exception(
+      '$message (${response.statusCode})',
+    );
+  }
+
+  // ------------------------------------------------------------
+  // SỬA BỆNH NHÂN
+  // PUT /api/patients/:id
+  // ------------------------------------------------------------
+
+  static Future<void> updatePatient({
+    required String id,
+    required String patientCode,
+    String? dateOfBirth,
+    required String gender,
+    required String identityCard,
+    required String address,
+    required String medicalHistory,
+    required String allergies,
+    required String status,
+  }) async {
+    final token = await TokenManager.getToken();
+
+    final patientId = id.trim();
+
+    if (patientId.isEmpty) {
+      throw Exception(
+        'ID bệnh nhân không hợp lệ',
+      );
+    }
+
+    final response = await http.put(
+      Uri.parse(
+        '$baseUrl/patients/$patientId',
+      ),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty)
+          'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'patientCode': patientCode,
+        'dateOfBirth': dateOfBirth,
+        'gender': gender,
+        'identityCard': identityCard,
+        'address': address,
+        'medicalHistory': medicalHistory,
+        'allergies': allergies,
+        'status': status,
+      }),
+    );
+
+    if (response.statusCode < 200 ||
+        response.statusCode >= 300) {
+      String message =
+          'Cập nhật bệnh nhân thất bại';
+
+      try {
+        final data = jsonDecode(response.body);
+
+        if (data is Map &&
+            data['message'] != null) {
+          message =
+              data['message'].toString();
+        }
+      } catch (_) {}
+
+      throw Exception(
+        '$message (${response.statusCode})',
+      );
+    }
+  }
+
+  // ------------------------------------------------------------
+  // XÓA BỆNH NHÂN
+  // DELETE /api/patients/:id
+  // ------------------------------------------------------------
+
+  static Future<bool> deletePatient(
+    String id,
+  ) async {
+    final token = await TokenManager.getToken();
+
+    final patientId = id.trim();
+
+    if (patientId.isEmpty) {
+      throw Exception(
+        'ID bệnh nhân không hợp lệ',
+      );
+    }
+
+    final response = await http.delete(
+      Uri.parse(
+        '$baseUrl/patients/$patientId',
+      ),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty)
+          'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    }
+
+    String message =
+        'Không thể xóa hồ sơ bệnh nhân';
 
     try {
       final data = jsonDecode(response.body);
