@@ -50,6 +50,20 @@ const doctorSchema = new mongoose.Schema(
       type: Number,
       default: 0,
       min: 0
+    },
+    // ==========================================================
+    // Điểm đánh giá trung bình & tổng số lượt đánh giá
+    // ==========================================================
+    rating: {
+      type: Number,
+      default: 5.0,
+      min: 0,
+      max: 5
+    },
+    totalReviews: {
+      type: Number,
+      default: 0,
+      min: 0
     }
   },
   {
