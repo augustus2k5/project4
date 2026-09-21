@@ -118,3 +118,22 @@ exports.cancelAppointment = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.getDoctorAppointments = async (req, res) => {
+  try {
+    // req.user.id được lấy từ verifyToken middleware sau khi decode JWT token
+    const doctorId = req.user.id; 
+
+    const appointments = await Appointment.find({ doctor: doctorId })
+      .populate('patient', 'fullName email phone') // Lấy thông tin bệnh nhân
+      .sort({ date: -1 });
+
+    return res.status(200).json(appointments);
+  } catch (error) {
+    return res.status(500).json({ 
+      message: 'Lỗi lấy danh sách lịch hẹn bác sĩ', 
+      error: error.message 
+    });
+  }
+};
+

@@ -1,3 +1,5 @@
+
+import 'package:app/booking_app/screens/doctor_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:app/features/auth/providers/auth_provider.dart';
@@ -21,22 +23,60 @@ class _BookingLoginPageState extends State<BookingLoginPage> {
     super.dispose();
   }
 
+  // Future<void> login() async {
+  //   if (email.text
+  //       .trim()
+  //       .isEmpty || password.text.isEmpty) {
+  //     _msg('Vui lòng nhập email và mật khẩu');
+  //     return;
+  //   }
+  //   final auth = context.read<AuthProvider>();
+  //   final ok = await auth.login(
+  //       email: email.text.trim(), password: password.text);
+  //   if (!mounted) return;
+  //   if (ok) {
+  //     Navigator.pushReplacement(
+  //         context, MaterialPageRoute(builder: (_) => const HomeShell()));
+  //   }
+  //   else {
+  //     _msg(auth.errorMessage ?? 'Đăng nhập thất bại');
+  //   }
+  // }
+
   Future<void> login() async {
-    if (email.text
-        .trim()
-        .isEmpty || password.text.isEmpty) {
+    if (email.text.trim().isEmpty || password.text.isEmpty) {
       _msg('Vui lòng nhập email và mật khẩu');
       return;
     }
+
     final auth = context.read<AuthProvider>();
     final ok = await auth.login(
-        email: email.text.trim(), password: password.text);
+      email: email.text.trim(),
+      password: password.text,
+    );
+
     if (!mounted) return;
+
     if (ok) {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (_) => const HomeShell()));
-    }
-    else {
+      print('================ DEBUG LOGIN ================');
+      print('1. Current User Object: ${auth.currentUser}');
+      print('2. Role lấy được: "${auth.currentUser?.role}"');
+      print('=============================================');
+
+      final String role = (auth.currentUser?.role ?? 'PATIENT').toString().toUpperCase();
+      print(role);
+      if (role.contains('DOCTOR')) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const DoctorHomeScreen()), // Màn hình Bác sĩ
+        );
+      }  else if (role.contains('PATIENT')) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeShell()),
+        );
+      }
+    } else {
       _msg(auth.errorMessage ?? 'Đăng nhập thất bại');
     }
   }

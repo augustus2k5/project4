@@ -18,7 +18,10 @@ app.use('/api/auth', require('./routes/authRoutes'));
 
 app.use('/api/users', require('./routes/userRoutes'));
 
-
+app.use(
+  '/api/patients',
+  require('./routes/patientRoutes')
+);
 app.use(
   '/api/specialties',
   require('./routes/specialtyRoutes')
