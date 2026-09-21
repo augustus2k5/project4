@@ -87,7 +87,7 @@ exports.login = async (req, res) => {
 
     // Trả kết quả
     res.status(200).json({
-      message: 'Đăng nhập Admin thành công!',
+      message: `Đăng nhập ${user.role} thành công!`,
       token,
       user: {
         id: user._id,

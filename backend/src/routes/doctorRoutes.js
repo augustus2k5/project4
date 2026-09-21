@@ -18,29 +18,16 @@ const {
 
 
 // GET tất cả bác sĩ
-router.get(
-  '/',
-  verifyToken,
-  getAllDoctors
-);
-
+router.get('/', getAllDoctors);
 
 // GET bác sĩ theo chuyên khoa
-router.get(
-  '/specialty/:specialtyId',
-  verifyToken,
-  getDoctorsBySpecialty
-);
-
+router.get('/specialty/:specialtyId', getDoctorsBySpecialty);
 
 // GET chi tiết bác sĩ
-router.get(
-  '/:id',
-  verifyToken,
-  getDoctorById
-);
+router.get('/:id', getDoctorById);
 
 
+// PROTECTED / ADMIN ROUTES (Chỉ Admin có Token mới được Thêm/Sửa/Xóa bác sĩ)
 // POST thêm bác sĩ
 router.post(
   '/',
@@ -49,7 +36,6 @@ router.post(
   createDoctor
 );
 
-
 // PUT sửa bác sĩ
 router.put(
   '/:id',
@@ -57,7 +43,6 @@ router.put(
   authorizeRoles('ADMIN'),
   updateDoctor
 );
-
 
 // DELETE xóa bác sĩ
 router.delete(
