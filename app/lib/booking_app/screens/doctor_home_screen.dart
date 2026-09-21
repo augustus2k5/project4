@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'doctor_home_page.dart';        
-import 'doctor_appointments_page.dart';     
+import 'doctor_appointments_page.dart'; 
+import 'profile_page.dart'; // 👈 Import trang ProfilePage vừa gửi
 
 class DoctorHomeScreen extends StatefulWidget {
   const DoctorHomeScreen({super.key});
@@ -17,8 +18,9 @@ class DoctorHomeScreenState extends State<DoctorHomeScreen> {
   }
 
   final pages = const [
-    DoctorHomePage(),          // Trang chủ bác sĩ
-    DoctorAppointmentsPage(),  // Danh sách bệnh nhân đặt lịch
+    DoctorHomePage(),         
+    DoctorAppointmentsPage(), 
+    ProfilePage(), // 👈 Mục Cá nhân hiển thị trang ProfilePage
   ];
 
   @override
