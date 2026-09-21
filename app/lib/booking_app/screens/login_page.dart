@@ -1,4 +1,5 @@
-import 'package:app/features/home/presentation/screens/doctor_home_screen.dart';
+
+import 'package:app/booking_app/screens/doctor_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:app/features/auth/providers/auth_provider.dart';
