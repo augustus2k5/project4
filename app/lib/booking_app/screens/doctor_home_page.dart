@@ -29,13 +29,11 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
     try {
       final auth = context.read<AuthProvider>();
       final token = auth.token;
-      final currentUserId = auth.currentUser?.id; // ID của Bác sĩ đang đăng nhập
+      final currentUserId =
+          auth.currentUser?.id; // ID của Bác sĩ đang đăng nhập
 
       // 1. Gọi API lấy toàn bộ danh sách lịch hẹn (endpoint có sẵn)
-      final response = await ApiService.get(
-        '/appointments',
-        token: token,
-      );
+      final response = await ApiService.get('/appointments', token: token);
 
       print('=== RAW RESPONSE ALL APPOINTMENTS: $response ===');
 
@@ -55,7 +53,8 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
         String? docUserId;
         if (doctorData is Map) {
           if (doctorData['userId'] is Map) {
-            docUserId = doctorData['userId']['_id'] ?? doctorData['userId']['id'];
+            docUserId =
+                doctorData['userId']['_id'] ?? doctorData['userId']['id'];
           } else {
             docUserId = doctorData['userId'] ?? doctorData['_id'];
           }
@@ -67,7 +66,8 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
       }).toList();
 
       final now = DateTime.now();
-      final todayStr = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+      final todayStr =
+          "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
 
       int todayCount = 0;
       int pendingCount = 0;
@@ -103,8 +103,6 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
       }
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -166,6 +164,79 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
               ),
             ],
           ),
+
+          
+          // Row(
+          //   children: [
+          //     // ==================== AVATAR ĐẠI DIỆN ====================
+          //     Container(
+          //       width: 48,
+          //       height: 48,
+          //       decoration: BoxDecoration(
+          //         color: const Color(0xffE0F2FE),
+          //         borderRadius: BorderRadius.circular(15),
+          //         border: Border.all(
+          //           color: const Color(0xffBAE6FD),
+          //           width: 1.5,
+          //         ),
+          //       ),
+          //       child: ClipRRect(
+          //         borderRadius: BorderRadius.circular(13),
+          //         child: user?.avatarUrl != null && user!.avatarUrl!.isNotEmpty
+          //             ? Image.network(
+          //                 user.avatarUrl!,
+          //                 fit: BoxFit.cover,
+          //                 errorBuilder: (_, __, ___) => const Icon(
+          //                   Icons.person_rounded,
+          //                   color: Color(0xff0284C7),
+          //                   size: 28,
+          //                 ),
+          //               )
+          //             : const Icon(
+          //                 Icons.person_rounded,
+          //                 color: Color(0xff0284C7),
+          //                 size: 28,
+          //               ),
+          //       ),
+          //     ),
+          //     const SizedBox(width: 12),
+          //     Expanded(
+          //       child: Column(
+          //         crossAxisAlignment: CrossAxisAlignment.start,
+          //         children: [
+          //           const Text(
+          //             'Xin chào, Bác sĩ 👨‍⚕️',
+          //             style: TextStyle(color: Color(0xff64748B)),
+          //           ),
+          //           Text(
+          //             user?.fullName ?? 'Bác sĩ',
+          //             style: const TextStyle(
+          //               fontSize: 20,
+          //               fontWeight: FontWeight.w800,
+          //             ),
+          //           ),
+          //         ],
+          //       ),
+          //     ),
+          //     Container(
+          //       width: 44,
+          //       height: 44,
+          //       decoration: BoxDecoration(
+          //         color: Colors.white,
+          //         borderRadius: BorderRadius.circular(14),
+          //         boxShadow: [
+          //           BoxShadow(
+          //             color: Colors.black.withValues(alpha: .05),
+          //             blurRadius: 12,
+          //           ),
+          //         ],
+          //       ),
+          //       child: const Icon(Icons.notifications_none_rounded),
+          //     ),
+          //   ],
+          // ),
+
+
           const SizedBox(height: 20),
 
           // Banner chính dành cho Bác sĩ
@@ -313,92 +384,103 @@ class _DoctorHomePageState extends State<DoctorHomePage> {
             )
           else
             ...upcomingAppointments.map((item) {
-  // Lấy thông tin bệnh nhân từ patientId
-  final patient = item['patientId'];
-  String patientName = 'Bệnh nhân';
-  String phone = '';
+              // Lấy thông tin bệnh nhân từ patientId
+              final patient = item['patientId'];
+              String patientName = 'Bệnh nhân';
+              String phone = '';
 
-  if (patient is Map) {
-    patientName = patient['fullName'] ?? 'Bệnh nhân';
-    phone = patient['phoneNumber'] ?? patient['phone'] ?? '';
-  }
+              if (patient is Map) {
+                patientName = patient['fullName'] ?? 'Bệnh nhân';
+                phone = patient['phoneNumber'] ?? patient['phone'] ?? '';
+              }
 
-  final timeSlot = item['timeSlot'] ?? item['time'] ?? 'Chưa xếp giờ';
-  final reason = item['reason'] ?? 'Khám định kỳ';
+              final timeSlot =
+                  item['timeSlot'] ?? item['time'] ?? 'Chưa xếp giờ';
+              final reason = item['reason'] ?? 'Khám định kỳ';
 
-  return Container(
-    margin: const EdgeInsets.only(bottom: 12),
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(18),
-      border: Border.all(color: const Color(0xffE2E8F0)),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: .02),
-          blurRadius: 8,
-          offset: const Offset(0, 2),
-        ),
-      ],
-    ),
-    child: Row(
-      children: [
-        const CircleAvatar(
-          radius: 22,
-          backgroundColor: Color(0xffE0F2FE),
-          child: Icon(Icons.person_rounded, color: Color(0xff0284C7)),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                patientName,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xff0F172A),
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: const Color(0xffE2E8F0)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: .02),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Lý do: $reason ${phone.isNotEmpty ? "• $phone" : ""}',
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: Color(0xff64748B),
+                child: Row(
+                  children: [
+                    const CircleAvatar(
+                      radius: 22,
+                      backgroundColor: Color(0xffE0F2FE),
+                      child: Icon(
+                        Icons.person_rounded,
+                        color: Color(0xff0284C7),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            patientName,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xff0F172A),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Lý do: $reason ${phone.isNotEmpty ? "• $phone" : ""}',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Color(0xff64748B),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xffF1F5F9),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.access_time_rounded,
+                            size: 14,
+                            color: Color(0xff0284C7),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            timeSlot,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xff0369A1),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            color: const Color(0xffF1F5F9),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.access_time_rounded, size: 14, color: Color(0xff0284C7)),
-              const SizedBox(width: 4),
-              Text(
-                timeSlot,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xff0369A1),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-})
+              );
+            }),
         ],
       ),
     );
