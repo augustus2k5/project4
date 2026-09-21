@@ -49,26 +49,68 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Xử lý Đăng nhập tài khoản
+  // Future<bool> login({required String email, required String password}) async {
+  //   _isLoading = true;
+  //   _errorMessage = null;
+  //   notifyListeners();
+  //   final result = await _authRepository.login(
+  //     email: email,
+  //     password: password,
+  //   );
+  //   _isLoading = false;
+  //   if (result['success'] == true) {
+  //     _token = result['token'];
+  //     _currentUser = UserModels.fromJson(result['user']);
+
+  //     // final prefs = await SharedPreferences.getInstance();
+  //     // await prefs.setString('token', _token!);
+  //     // await prefs.setString('user_data', jsonEncode(result['user']));
+
+  //     notifyListeners();
+  //     return true;
+  //   } else {
+  //     _errorMessage = result['message'];
+  //     notifyListeners();
+  //     return false;
+  //   }
+  // }
+
+  /// Xử lý Đăng nhập tài khoản
   Future<bool> login({required String email, required String password}) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
+
     final result = await _authRepository.login(
       email: email,
       password: password,
     );
+
     _isLoading = false;
-    if (result['success'] == true) {
+
+    // 👈 SỬA DÒNG NÀY: Kiểm tra nếu có result['token'] HOẶC result['success'] == true
+    final bool isSuccess = (result['token'] != null) || (result['success'] == true);
+
+    if (isSuccess) {
       _token = result['token'];
       _currentUser = UserModels.fromJson(result['user']);
+
+      // Lưu thông tin vào SharedPreferences để giữ trạng thái đăng nhập
+      final prefs = await SharedPreferences.getInstance();
+      if (_token != null) await prefs.setString('token', _token!);
+      if (result['user'] != null) {
+        await prefs.setString('user_data', jsonEncode(result['user']));
+      }
+
       notifyListeners();
-      return true;
+      return true; // Chắc chắn trả về true cho cả Patient & Doctor!
     } else {
-      _errorMessage = result['message'];
+      _errorMessage = result['message'] ?? 'Đăng nhập thất bại';
       notifyListeners();
       return false;
     }
   }
+
 
   /// Đăng xuất
   void logout() {
