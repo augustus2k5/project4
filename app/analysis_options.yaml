@@ -31,3 +31,10 @@ linter:
 analyzer:
   exclude:
     - flutter_application_1/**
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**

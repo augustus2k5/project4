@@ -1,6 +1,8 @@
 const User = require("../models/User");
 
-const bcrypt = require("bcryptjs");
+
+const bcrypt = require('bcryptjs');
+
 
 const getUsers = async (req, res) => {
     try {
@@ -22,8 +24,7 @@ const updateProfile = async (req, res) => {
     const userId = req.user.id; // Lấy ID từ Token
     const { fullName, email, phoneNumber, currentPassword, newPassword, avatar } = req.body;
 
-    // Bắt buộc phải có mật khẩu hiện tại
-
+    // Bắt buộc phải có mật khẩu hiện tại để xác nhận bảo mật
     if (!currentPassword) {
       return res.status(400).json({ message: "Vui lòng nhập mật khẩu hiện tại để xác nhận thay đổi!" });
     }
@@ -32,15 +33,14 @@ const updateProfile = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "Không tìm thấy người dùng!" });
     }
-
-    // Kiểm tra mật khẩu hiện tại
+    // Kiểm tra mật khẩu hiện tại có đúng không
 
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Mật khẩu hiện tại không chính xác!" });
     }
 
-    // Nếu người dùng đổi Email -> Kiểm tra xem email mới đã có ai dùng chưa
+    // Nếu người dùng đổi Email -> Kiểm tra xem email mới đã bị ai dùng chưa
 
     if (email && email.toLowerCase() !== user.email) {
       const emailExists = await User.findOne({ 
@@ -49,7 +49,7 @@ const updateProfile = async (req, res) => {
       });
       if (emailExists) {
 
-        return res.status(400).json({ message: "Email mới này đã được người khác sử dụng!" });
+        return res.status(400).json({ message: "Email này đã được người khác sử dụng!" });
 
       }
       user.email = email.toLowerCase();
@@ -59,7 +59,7 @@ const updateProfile = async (req, res) => {
     if (phoneNumber !== undefined) user.phoneNumber = phoneNumber;
     if (avatar !== undefined) user.avatar = avatar;
 
-    // Nếu người dùng đổi mật khẩu mới
+    // NẾU CÓ ĐỔI MẬT KHẨU MỚI -> Mã hóa và lưu vào Database
 
     if (newPassword && newPassword.trim().length > 0) {
       if (newPassword.length < 6) {
@@ -103,7 +103,9 @@ const changePassword = async (req, res) => {
     user.password = await bcrypt.hash(newPassword, salt);
     await user.save();
     res.status(200).json({ message: "Đổi mật khẩu thành công!" });
-  }  catch (error) {
+
+  } catch (error) {
+
     res.status(500).json({ message: error.message });
   }
     };
@@ -111,8 +113,10 @@ const changePassword = async (req, res) => {
 
 
 
+
 module.exports = {
     getUsers,
+
     updateProfile,
     changePassword
 

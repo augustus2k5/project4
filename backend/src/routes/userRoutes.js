@@ -6,6 +6,7 @@ const { getUsers, updateProfile, changePassword } = require("../controllers/user
 
 const { verifyToken, authorizeRoles } = require("../middleware/authMiddleware");
 router.get("/", verifyToken, authorizeRoles("ADMIN"), getUsers);
+
 router.put("/profile", verifyToken, updateProfile);
 router.put("/change-password", verifyToken, changePassword);
 

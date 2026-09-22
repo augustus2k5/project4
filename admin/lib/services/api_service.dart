@@ -11,8 +11,7 @@ class ApiService {
   // BASE URL
   // ============================================================
 
-  static const String baseUrl =
-      'http://localhost:5000/api';
+  static const String baseUrl = 'http://localhost:5000/api';
 
   // Android Emulator:
   // static const String baseUrl =
@@ -34,13 +33,8 @@ class ApiService {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/login'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-        }),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'password': password}),
       );
 
       final data = jsonDecode(response.body);
@@ -56,16 +50,10 @@ class ApiService {
 
       return {
         'success': false,
-        'message':
-            data['message'] ??
-                'Đăng nhập thất bại',
+        'message': data['message'] ?? 'Đăng nhập thất bại',
       };
     } catch (e) {
-      return {
-        'success': false,
-        'message':
-            'Không thể kết nối đến máy chủ',
-      };
+      return {'success': false, 'message': 'Không thể kết nối đến máy chủ'};
     }
   }
 
@@ -75,8 +63,7 @@ class ApiService {
   // ============================================================
 
   static Future<List<UserModel>> getUsers() async {
-    final token =
-        await TokenManager.getToken();
+    final token = await TokenManager.getToken();
 
     final response = await http.get(
       Uri.parse('$baseUrl/users'),
@@ -87,20 +74,12 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      final List data =
-          jsonDecode(response.body);
+      final List data = jsonDecode(response.body);
 
-      return data
-          .map(
-            (json) =>
-                UserModel.fromJson(json),
-          )
-          .toList();
+      return data.map((json) => UserModel.fromJson(json)).toList();
     }
 
-    throw Exception(
-      'Không thể lấy danh sách người dùng',
-    );
+    throw Exception('Không thể lấy danh sách người dùng');
   }
 
   // ============================================================
@@ -108,11 +87,8 @@ class ApiService {
   // DELETE /api/users/:id
   // ============================================================
 
-  static Future<bool> deleteUser(
-    String id,
-  ) async {
-    final token =
-        await TokenManager.getToken();
+  static Future<bool> deleteUser(String id) async {
+    final token = await TokenManager.getToken();
 
     final response = await http.delete(
       Uri.parse('$baseUrl/users/$id'),
@@ -130,11 +106,8 @@ class ApiService {
   // PUT /api/users/:id/block
   // ============================================================
 
-  static Future<bool> blockUser(
-    String id,
-  ) async {
-    final token =
-        await TokenManager.getToken();
+  static Future<bool> blockUser(String id) async {
+    final token = await TokenManager.getToken();
 
     final response = await http.put(
       Uri.parse('$baseUrl/users/$id/block'),
@@ -152,11 +125,8 @@ class ApiService {
   // PUT /api/users/:id/unblock
   // ============================================================
 
-  static Future<bool> unblockUser(
-    String id,
-  ) async {
-    final token =
-        await TokenManager.getToken();
+  static Future<bool> unblockUser(String id) async {
+    final token = await TokenManager.getToken();
 
     final response = await http.put(
       Uri.parse('$baseUrl/users/$id/unblock'),
@@ -174,10 +144,8 @@ class ApiService {
   // GET /api/specialties
   // ============================================================
 
-  static Future<List<Specialty>>
-      getSpecialties() async {
-    final token =
-        await TokenManager.getToken();
+  static Future<List<Specialty>> getSpecialties() async {
+    final token = await TokenManager.getToken();
 
     final response = await http.get(
       Uri.parse('$baseUrl/specialties'),
@@ -188,20 +156,12 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      final List data =
-          jsonDecode(response.body);
+      final List data = jsonDecode(response.body);
 
-      return data
-          .map(
-            (json) =>
-                Specialty.fromJson(json),
-          )
-          .toList();
+      return data.map((json) => Specialty.fromJson(json)).toList();
     }
 
-    throw Exception(
-      'Không thể lấy danh sách chuyên khoa',
-    );
+    throw Exception('Không thể lấy danh sách chuyên khoa');
   }
 
   // ============================================================
@@ -214,8 +174,7 @@ class ApiService {
     required String description,
     required String status,
   }) async {
-    final token =
-        await TokenManager.getToken();
+    final token = await TokenManager.getToken();
 
     final response = await http.post(
       Uri.parse('$baseUrl/specialties'),
@@ -244,8 +203,7 @@ class ApiService {
     required String description,
     required String status,
   }) async {
-    final token =
-        await TokenManager.getToken();
+    final token = await TokenManager.getToken();
 
     final response = await http.put(
       Uri.parse('$baseUrl/specialties/$id'),
@@ -268,11 +226,8 @@ class ApiService {
   // DELETE /api/specialties/:id
   // ============================================================
 
-  static Future<bool> deleteSpecialty(
-    String id,
-  ) async {
-    final token =
-        await TokenManager.getToken();
+  static Future<bool> deleteSpecialty(String id) async {
+    final token = await TokenManager.getToken();
 
     final response = await http.delete(
       Uri.parse('$baseUrl/specialties/$id'),
@@ -290,10 +245,8 @@ class ApiService {
   // GET /api/appointments
   // ============================================================
 
-  static Future<List<dynamic>>
-      getAppointments() async {
-    final token =
-        await TokenManager.getToken();
+  static Future<List<dynamic>> getAppointments() async {
+    final token = await TokenManager.getToken();
 
     final response = await http.get(
       Uri.parse('$baseUrl/appointments'),
@@ -304,8 +257,7 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      final data =
-          jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
       if (data is List) {
         return data;
@@ -314,9 +266,7 @@ class ApiService {
       return [];
     }
 
-    throw Exception(
-      'Không thể tải danh sách lịch hẹn',
-    );
+    throw Exception('Không thể tải danh sách lịch hẹn');
   }
 
   // ============================================================
@@ -324,25 +274,19 @@ class ApiService {
   // PATCH /api/appointments/:id/status
   // ============================================================
 
-  static Future<bool>
-      updateAppointmentStatus({
+  static Future<bool> updateAppointmentStatus({
     required String id,
     required String status,
   }) async {
-    final token =
-        await TokenManager.getToken();
+    final token = await TokenManager.getToken();
 
     final response = await http.patch(
-      Uri.parse(
-        '$baseUrl/appointments/$id/status',
-      ),
+      Uri.parse('$baseUrl/appointments/$id/status'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
       },
-      body: jsonEncode({
-        'status': status,
-      }),
+      body: jsonEncode({'status': status}),
     );
 
     return response.statusCode == 200;
@@ -353,52 +297,38 @@ class ApiService {
   // GET /api/doctors
   // ============================================================
 
-  static Future<List<dynamic>>
-      getDoctors() async {
-    final token =
-        await TokenManager.getToken();
+  static Future<List<dynamic>> getDoctors() async {
+    final token = await TokenManager.getToken();
 
     final response = await http.get(
       Uri.parse('$baseUrl/doctors'),
       headers: {
         'Content-Type': 'application/json',
-        if (token != null &&
-            token.isNotEmpty)
-          'Authorization':
-              'Bearer $token',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
       },
     );
 
     if (response.statusCode == 200) {
-      final data =
-          jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
       if (data is List) {
         return data;
       }
 
-      throw Exception(
-        'Dữ liệu bác sĩ không hợp lệ',
-      );
+      throw Exception('Dữ liệu bác sĩ không hợp lệ');
     }
 
-    String message =
-        'Không thể lấy danh sách bác sĩ';
+    String message = 'Không thể lấy danh sách bác sĩ';
 
     try {
-      final data =
-          jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-      if (data is Map &&
-          data['message'] != null) {
-        message =
-            data['message'].toString();
+      if (data is Map && data['message'] != null) {
+        message = data['message'].toString();
       }
     } catch (_) {}
 
-    throw Exception(
-      '$message (${response.statusCode})',
-    );
+    throw Exception('$message (${response.statusCode})');
   }
 
   // ============================================================
@@ -413,50 +343,38 @@ class ApiService {
     required String bio,
     required int experienceYears,
   }) async {
-    final token =
-        await TokenManager.getToken();
+    final token = await TokenManager.getToken();
 
     final response = await http.post(
       Uri.parse('$baseUrl/doctors'),
       headers: {
         'Content-Type': 'application/json',
-        if (token != null &&
-            token.isNotEmpty)
-          'Authorization':
-              'Bearer $token',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
         'userId': userId,
         'specialtyId': specialtyId,
         'price': price,
         'bio': bio,
-        'experienceYears':
-            experienceYears,
+        'experienceYears': experienceYears,
       }),
     );
 
-    if (response.statusCode == 200 ||
-        response.statusCode == 201) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       return true;
     }
 
-    String message =
-        'Không thể thêm bác sĩ';
+    String message = 'Không thể thêm bác sĩ';
 
     try {
-      final data =
-          jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-      if (data is Map &&
-          data['message'] != null) {
-        message =
-            data['message'].toString();
+      if (data is Map && data['message'] != null) {
+        message = data['message'].toString();
       }
     } catch (_) {}
 
-    throw Exception(
-      '$message (${response.statusCode})',
-    );
+    throw Exception('$message (${response.statusCode})');
   }
 
   // ============================================================
@@ -471,92 +389,61 @@ class ApiService {
     required String bio,
     required int experienceYears,
   }) async {
-    final token =
-        await TokenManager.getToken();
+    final token = await TokenManager.getToken();
 
     final doctorId = id.trim();
 
     if (doctorId.isEmpty) {
-      throw Exception(
-        'ID bác sĩ không hợp lệ',
-      );
+      throw Exception('ID bác sĩ không hợp lệ');
     }
 
-    final url =
-        '$baseUrl/doctors/$doctorId';
+    final url = '$baseUrl/doctors/$doctorId';
 
-    print(
-      '========================================',
-    );
+    print('========================================');
     print('UPDATE DOCTOR');
     print('URL: $url');
     print('METHOD: PUT');
     print('ID: $doctorId');
     print('SPECIALTY: $specialtyId');
     print('PRICE: $price');
-    print(
-      'EXPERIENCE: $experienceYears',
-    );
-    print(
-      '========================================',
-    );
+    print('EXPERIENCE: $experienceYears');
+    print('========================================');
 
     try {
-      final response =
-          await http.put(
+      final response = await http.put(
         Uri.parse(url),
         headers: {
-          'Content-Type':
-              'application/json',
-          if (token != null &&
-              token.isNotEmpty)
-            'Authorization':
-                'Bearer $token',
+          'Content-Type': 'application/json',
+          if (token != null && token.isNotEmpty)
+            'Authorization': 'Bearer $token',
         },
         body: jsonEncode({
-          'specialtyId':
-              specialtyId,
+          'specialtyId': specialtyId,
           'price': price,
           'bio': bio,
-          'experienceYears':
-              experienceYears,
+          'experienceYears': experienceYears,
         }),
       );
 
-      print(
-        '========================================',
-      );
+      print('========================================');
       print('UPDATE DOCTOR RESPONSE');
-      print(
-        'STATUS: ${response.statusCode}',
-      );
-      print(
-        'BODY: ${response.body}',
-      );
-      print(
-        '========================================',
-      );
+      print('STATUS: ${response.statusCode}');
+      print('BODY: ${response.body}');
+      print('========================================');
 
-      if (response.statusCode >= 200 &&
-          response.statusCode < 300) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
         return true;
       }
 
-      String message =
-          'Cập nhật bác sĩ thất bại';
+      String message = 'Cập nhật bác sĩ thất bại';
 
       try {
-        final data =
-            jsonDecode(response.body);
+        final data = jsonDecode(response.body);
 
-        if (data is Map &&
-            data['message'] != null) {
-          message =
-              data['message'].toString();
-        } else if (data is Map &&
-            data['error'] != null) {
-          message =
-              data['error'].toString();
+        if (data is Map && data['message'] != null) {
+          message = data['message'].toString();
+        } else if (data is Map && data['error'] != null) {
+          message = data['error'].toString();
         }
       } catch (_) {
         if (response.body.isNotEmpty) {
@@ -580,28 +467,20 @@ class ApiService {
       }
 
       if (response.statusCode == 403) {
-        throw Exception(
-          'Bạn không có quyền cập nhật bác sĩ.',
-        );
+        throw Exception('Bạn không có quyền cập nhật bác sĩ.');
       }
 
       if (response.statusCode == 400) {
-        throw Exception(
-          '$message\nDữ liệu gửi lên không hợp lệ.',
-        );
+        throw Exception('$message\nDữ liệu gửi lên không hợp lệ.');
       }
 
-      throw Exception(
-        '$message (${response.statusCode})',
-      );
+      throw Exception('$message (${response.statusCode})');
     } catch (e) {
       if (e is Exception) {
         rethrow;
       }
 
-      throw Exception(
-        'Không thể kết nối đến máy chủ: $e',
-      );
+      throw Exception('Không thể kết nối đến máy chủ: $e');
     }
   }
 
@@ -610,57 +489,38 @@ class ApiService {
   // GET /api/doctors/:id
   // ============================================================
 
-  static Future<Map<String, dynamic>>
-      getDoctorById(
-    String id,
-  ) async {
-    final token =
-        await TokenManager.getToken();
+  static Future<Map<String, dynamic>> getDoctorById(String id) async {
+    final token = await TokenManager.getToken();
 
     final response = await http.get(
       Uri.parse('$baseUrl/doctors/$id'),
       headers: {
-        'Content-Type':
-            'application/json',
-        if (token != null &&
-            token.isNotEmpty)
-          'Authorization':
-              'Bearer $token',
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
       },
     );
 
     if (response.statusCode == 200) {
-      final data =
-          jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
       if (data is Map) {
-        return Map<String, dynamic>.from(
-          data,
-        );
+        return Map<String, dynamic>.from(data);
       }
 
-      throw Exception(
-        'Dữ liệu bác sĩ không hợp lệ',
-      );
+      throw Exception('Dữ liệu bác sĩ không hợp lệ');
     }
 
-    String message =
-        'Không thể lấy thông tin bác sĩ';
+    String message = 'Không thể lấy thông tin bác sĩ';
 
     try {
-      final data =
-          jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-      if (data is Map &&
-          data['message'] != null) {
-        message =
-            data['message'].toString();
+      if (data is Map && data['message'] != null) {
+        message = data['message'].toString();
       }
     } catch (_) {}
 
-    throw Exception(
-      '$message (${response.statusCode})',
-    );
+    throw Exception('$message (${response.statusCode})');
   }
 
   // ============================================================
@@ -668,32 +528,20 @@ class ApiService {
   // DELETE /api/doctors/:id
   // ============================================================
 
-  static Future<bool> deleteDoctor(
-    String id,
-  ) async {
-    final token =
-        await TokenManager.getToken();
+  static Future<bool> deleteDoctor(String id) async {
+    final token = await TokenManager.getToken();
 
     final doctorId = id.trim();
 
     if (doctorId.isEmpty) {
-      throw Exception(
-        'ID bác sĩ không hợp lệ',
-      );
+      throw Exception('ID bác sĩ không hợp lệ');
     }
 
-    final response =
-        await http.delete(
-      Uri.parse(
-        '$baseUrl/doctors/$doctorId',
-      ),
+    final response = await http.delete(
+      Uri.parse('$baseUrl/doctors/$doctorId'),
       headers: {
-        'Content-Type':
-            'application/json',
-        if (token != null &&
-            token.isNotEmpty)
-          'Authorization':
-              'Bearer $token',
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
       },
     );
 
@@ -701,23 +549,17 @@ class ApiService {
       return true;
     }
 
-    String message =
-        'Không thể xóa bác sĩ';
+    String message = 'Không thể xóa bác sĩ';
 
     try {
-      final data =
-          jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-      if (data is Map &&
-          data['message'] != null) {
-        message =
-            data['message'].toString();
+      if (data is Map && data['message'] != null) {
+        message = data['message'].toString();
       }
     } catch (_) {}
 
-    throw Exception(
-      '$message (${response.statusCode})',
-    );
+    throw Exception('$message (${response.statusCode})');
   }
 
   // ============================================================
@@ -725,62 +567,40 @@ class ApiService {
   // GET /api/patients
   // ============================================================
 
-  static Future<List<PatientModel>>
-      getPatients() async {
-    final token =
-        await TokenManager.getToken();
+  static Future<List<PatientModel>> getPatients() async {
+    final token = await TokenManager.getToken();
 
     final response = await http.get(
       Uri.parse('$baseUrl/patients'),
       headers: {
-        'Content-Type':
-            'application/json',
-        if (token != null &&
-            token.isNotEmpty)
-          'Authorization':
-              'Bearer $token',
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
       },
     );
 
     if (response.statusCode == 200) {
-      final data =
-          jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
       if (data is! List) {
-        throw Exception(
-          'Dữ liệu bệnh nhân không hợp lệ',
-        );
+        throw Exception('Dữ liệu bệnh nhân không hợp lệ');
       }
 
       return data
-          .map(
-            (json) =>
-                PatientModel.fromJson(
-              Map<String, dynamic>.from(
-                json,
-              ),
-            ),
-          )
+          .map((json) => PatientModel.fromJson(Map<String, dynamic>.from(json)))
           .toList();
     }
 
-    String message =
-        'Không thể lấy danh sách bệnh nhân';
+    String message = 'Không thể lấy danh sách bệnh nhân';
 
     try {
-      final data =
-          jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-      if (data is Map &&
-          data['message'] != null) {
-        message =
-            data['message'].toString();
+      if (data is Map && data['message'] != null) {
+        message = data['message'].toString();
       }
     } catch (_) {}
 
-    throw Exception(
-      '$message (${response.statusCode})',
-    );
+    throw Exception('$message (${response.statusCode})');
   }
 
   // ============================================================
@@ -798,56 +618,41 @@ class ApiService {
     required String medicalHistory,
     required String allergies,
   }) async {
-    final token =
-        await TokenManager.getToken();
+    final token = await TokenManager.getToken();
 
     final response = await http.post(
       Uri.parse('$baseUrl/patients'),
       headers: {
-        'Content-Type':
-            'application/json',
-        if (token != null &&
-            token.isNotEmpty)
-          'Authorization':
-              'Bearer $token',
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
         'userId': userId,
         'patientCode': patientCode,
-        'dateOfBirth':
-            dateOfBirth,
+        'dateOfBirth': dateOfBirth,
         'gender': gender,
-        'identityCard':
-            identityCard,
+        'identityCard': identityCard,
         'address': address,
-        'medicalHistory':
-            medicalHistory,
+        'medicalHistory': medicalHistory,
         'allergies': allergies,
       }),
     );
 
-    if (response.statusCode == 200 ||
-        response.statusCode == 201) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       return true;
     }
 
-    String message =
-        'Không thể thêm hồ sơ bệnh nhân';
+    String message = 'Không thể thêm hồ sơ bệnh nhân';
 
     try {
-      final data =
-          jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-      if (data is Map &&
-          data['message'] != null) {
-        message =
-            data['message'].toString();
+      if (data is Map && data['message'] != null) {
+        message = data['message'].toString();
       }
     } catch (_) {}
 
-    throw Exception(
-      '$message (${response.statusCode})',
-    );
+    throw Exception('$message (${response.statusCode})');
   }
 
   // ============================================================
@@ -866,64 +671,44 @@ class ApiService {
     required String allergies,
     required String status,
   }) async {
-    final token =
-        await TokenManager.getToken();
+    final token = await TokenManager.getToken();
 
     final patientId = id.trim();
 
     if (patientId.isEmpty) {
-      throw Exception(
-        'ID bệnh nhân không hợp lệ',
-      );
+      throw Exception('ID bệnh nhân không hợp lệ');
     }
 
     final response = await http.put(
-      Uri.parse(
-        '$baseUrl/patients/$patientId',
-      ),
+      Uri.parse('$baseUrl/patients/$patientId'),
       headers: {
-        'Content-Type':
-            'application/json',
-        if (token != null &&
-            token.isNotEmpty)
-          'Authorization':
-              'Bearer $token',
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
-        'patientCode':
-            patientCode,
-        'dateOfBirth':
-            dateOfBirth,
+        'patientCode': patientCode,
+        'dateOfBirth': dateOfBirth,
         'gender': gender,
-        'identityCard':
-            identityCard,
+        'identityCard': identityCard,
         'address': address,
-        'medicalHistory':
-            medicalHistory,
+        'medicalHistory': medicalHistory,
         'allergies': allergies,
         'status': status,
       }),
     );
 
-    if (response.statusCode < 200 ||
-        response.statusCode >= 300) {
-      String message =
-          'Cập nhật bệnh nhân thất bại';
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      String message = 'Cập nhật bệnh nhân thất bại';
 
       try {
-        final data =
-            jsonDecode(response.body);
+        final data = jsonDecode(response.body);
 
-        if (data is Map &&
-            data['message'] != null) {
-          message =
-              data['message'].toString();
+        if (data is Map && data['message'] != null) {
+          message = data['message'].toString();
         }
       } catch (_) {}
 
-      throw Exception(
-        '$message (${response.statusCode})',
-      );
+      throw Exception('$message (${response.statusCode})');
     }
   }
 
@@ -932,32 +717,20 @@ class ApiService {
   // DELETE /api/patients/:id
   // ============================================================
 
-  static Future<bool> deletePatient(
-    String id,
-  ) async {
-    final token =
-        await TokenManager.getToken();
+  static Future<bool> deletePatient(String id) async {
+    final token = await TokenManager.getToken();
 
     final patientId = id.trim();
 
     if (patientId.isEmpty) {
-      throw Exception(
-        'ID bệnh nhân không hợp lệ',
-      );
+      throw Exception('ID bệnh nhân không hợp lệ');
     }
 
-    final response =
-        await http.delete(
-      Uri.parse(
-        '$baseUrl/patients/$patientId',
-      ),
+    final response = await http.delete(
+      Uri.parse('$baseUrl/patients/$patientId'),
       headers: {
-        'Content-Type':
-            'application/json',
-        if (token != null &&
-            token.isNotEmpty)
-          'Authorization':
-              'Bearer $token',
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
       },
     );
 
@@ -965,23 +738,17 @@ class ApiService {
       return true;
     }
 
-    String message =
-        'Không thể xóa hồ sơ bệnh nhân';
+    String message = 'Không thể xóa hồ sơ bệnh nhân';
 
     try {
-      final data =
-          jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-      if (data is Map &&
-          data['message'] != null) {
-        message =
-            data['message'].toString();
+      if (data is Map && data['message'] != null) {
+        message = data['message'].toString();
       }
     } catch (_) {}
 
-    throw Exception(
-      '$message (${response.statusCode})',
-    );
+    throw Exception('$message (${response.statusCode})');
   }
 
   // ============================================================
@@ -993,28 +760,19 @@ class ApiService {
   // GET /api/medical-records
   // ------------------------------------------------------------
 
-  static Future<List<dynamic>>
-      getMedicalRecords() async {
-    final token =
-        await TokenManager.getToken();
+  static Future<List<dynamic>> getMedicalRecords() async {
+    final token = await TokenManager.getToken();
 
     final response = await http.get(
-      Uri.parse(
-        '$baseUrl/medical-records',
-      ),
+      Uri.parse('$baseUrl/medical-records'),
       headers: {
-        'Content-Type':
-            'application/json',
-        if (token != null &&
-            token.isNotEmpty)
-          'Authorization':
-              'Bearer $token',
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
       },
     );
 
     if (response.statusCode == 200) {
-      final data =
-          jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
       if (data is List) {
         return data;
@@ -1023,23 +781,17 @@ class ApiService {
       return [];
     }
 
-    String message =
-        'Không thể lấy danh sách hồ sơ bệnh án';
+    String message = 'Không thể lấy danh sách hồ sơ bệnh án';
 
     try {
-      final data =
-          jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-      if (data is Map &&
-          data['message'] != null) {
-        message =
-            data['message'].toString();
+      if (data is Map && data['message'] != null) {
+        message = data['message'].toString();
       }
     } catch (_) {}
 
-    throw Exception(
-      '$message (${response.statusCode})',
-    );
+    throw Exception('$message (${response.statusCode})');
   }
 
   // ------------------------------------------------------------
@@ -1047,24 +799,14 @@ class ApiService {
   // GET /api/medical-records/:id
   // ------------------------------------------------------------
 
-  static Future<dynamic>
-      getMedicalRecordById(
-    String id,
-  ) async {
-    final token =
-        await TokenManager.getToken();
+  static Future<dynamic> getMedicalRecordById(String id) async {
+    final token = await TokenManager.getToken();
 
     final response = await http.get(
-      Uri.parse(
-        '$baseUrl/medical-records/$id',
-      ),
+      Uri.parse('$baseUrl/medical-records/$id'),
       headers: {
-        'Content-Type':
-            'application/json',
-        if (token != null &&
-            token.isNotEmpty)
-          'Authorization':
-              'Bearer $token',
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
       },
     );
 
@@ -1072,23 +814,17 @@ class ApiService {
       return jsonDecode(response.body);
     }
 
-    String message =
-        'Không thể lấy hồ sơ bệnh án';
+    String message = 'Không thể lấy hồ sơ bệnh án';
 
     try {
-      final data =
-          jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-      if (data is Map &&
-          data['message'] != null) {
-        message =
-            data['message'].toString();
+      if (data is Map && data['message'] != null) {
+        message = data['message'].toString();
       }
     } catch (_) {}
 
-    throw Exception(
-      '$message (${response.statusCode})',
-    );
+    throw Exception('$message (${response.statusCode})');
   }
 
   // ------------------------------------------------------------
@@ -1096,30 +832,21 @@ class ApiService {
   // GET /api/medical-records/patient/:patientId
   // ------------------------------------------------------------
 
-  static Future<List<dynamic>>
-      getPatientMedicalRecords(
+  static Future<List<dynamic>> getPatientMedicalRecords(
     String patientId,
   ) async {
-    final token =
-        await TokenManager.getToken();
+    final token = await TokenManager.getToken();
 
     final response = await http.get(
-      Uri.parse(
-        '$baseUrl/medical-records/patient/$patientId',
-      ),
+      Uri.parse('$baseUrl/medical-records/patient/$patientId'),
       headers: {
-        'Content-Type':
-            'application/json',
-        if (token != null &&
-            token.isNotEmpty)
-          'Authorization':
-              'Bearer $token',
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
       },
     );
 
     if (response.statusCode == 200) {
-      final data =
-          jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
       if (data is List) {
         return data;
@@ -1128,23 +855,17 @@ class ApiService {
       return [];
     }
 
-    String message =
-        'Không thể lấy hồ sơ bệnh án của bệnh nhân';
+    String message = 'Không thể lấy hồ sơ bệnh án của bệnh nhân';
 
     try {
-      final data =
-          jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-      if (data is Map &&
-          data['message'] != null) {
-        message =
-            data['message'].toString();
+      if (data is Map && data['message'] != null) {
+        message = data['message'].toString();
       }
     } catch (_) {}
 
-    throw Exception(
-      '$message (${response.statusCode})',
-    );
+    throw Exception('$message (${response.statusCode})');
   }
 
   // ------------------------------------------------------------
@@ -1152,68 +873,47 @@ class ApiService {
   // POST /api/medical-records
   // ------------------------------------------------------------
 
-  static Future<bool>
-      createMedicalRecord({
+  static Future<bool> createMedicalRecord({
     required String appointmentId,
     required String patientId,
     required String doctorId,
     required String diagnosis,
     String notes = '',
-    List<Map<String, dynamic>>
-        prescriptions = const [],
+    List<Map<String, dynamic>> prescriptions = const [],
   }) async {
-    final token =
-        await TokenManager.getToken();
+    final token = await TokenManager.getToken();
 
     final response = await http.post(
-      Uri.parse(
-        '$baseUrl/medical-records',
-      ),
+      Uri.parse('$baseUrl/medical-records'),
       headers: {
-        'Content-Type':
-            'application/json',
-        if (token != null &&
-            token.isNotEmpty)
-          'Authorization':
-              'Bearer $token',
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
-        'appointmentId':
-            appointmentId,
-        'patientId':
-            patientId,
-        'doctorId':
-            doctorId,
-        'diagnosis':
-            diagnosis,
+        'appointmentId': appointmentId,
+        'patientId': patientId,
+        'doctorId': doctorId,
+        'diagnosis': diagnosis,
         'notes': notes,
-        'prescriptions':
-            prescriptions,
+        'prescriptions': prescriptions,
       }),
     );
 
-    if (response.statusCode == 201 ||
-        response.statusCode == 200) {
+    if (response.statusCode == 201 || response.statusCode == 200) {
       return true;
     }
 
-    String message =
-        'Không thể tạo hồ sơ bệnh án';
+    String message = 'Không thể tạo hồ sơ bệnh án';
 
     try {
-      final data =
-          jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-      if (data is Map &&
-          data['message'] != null) {
-        message =
-            data['message'].toString();
+      if (data is Map && data['message'] != null) {
+        message = data['message'].toString();
       }
     } catch (_) {}
 
-    throw Exception(
-      '$message (${response.statusCode})',
-    );
+    throw Exception('$message (${response.statusCode})');
   }
 
   // ------------------------------------------------------------
@@ -1221,52 +921,36 @@ class ApiService {
   // PUT /api/medical-records/:id
   // ------------------------------------------------------------
 
-  static Future<bool>
-      updateMedicalRecord({
+  static Future<bool> updateMedicalRecord({
     required String id,
     required String appointmentId,
     required String patientId,
     required String doctorId,
     required String diagnosis,
     String notes = '',
-    List<Map<String, dynamic>>
-        prescriptions = const [],
+    List<Map<String, dynamic>> prescriptions = const [],
   }) async {
-    final token =
-        await TokenManager.getToken();
+    final token = await TokenManager.getToken();
 
     final recordId = id.trim();
 
     if (recordId.isEmpty) {
-      throw Exception(
-        'ID hồ sơ bệnh án không hợp lệ',
-      );
+      throw Exception('ID hồ sơ bệnh án không hợp lệ');
     }
 
     final response = await http.put(
-      Uri.parse(
-        '$baseUrl/medical-records/$recordId',
-      ),
+      Uri.parse('$baseUrl/medical-records/$recordId'),
       headers: {
-        'Content-Type':
-            'application/json',
-        if (token != null &&
-            token.isNotEmpty)
-          'Authorization':
-              'Bearer $token',
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
-        'appointmentId':
-            appointmentId,
-        'patientId':
-            patientId,
-        'doctorId':
-            doctorId,
-        'diagnosis':
-            diagnosis,
+        'appointmentId': appointmentId,
+        'patientId': patientId,
+        'doctorId': doctorId,
+        'diagnosis': diagnosis,
         'notes': notes,
-        'prescriptions':
-            prescriptions,
+        'prescriptions': prescriptions,
       }),
     );
 
@@ -1274,23 +958,17 @@ class ApiService {
       return true;
     }
 
-    String message =
-        'Không thể cập nhật hồ sơ bệnh án';
+    String message = 'Không thể cập nhật hồ sơ bệnh án';
 
     try {
-      final data =
-          jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-      if (data is Map &&
-          data['message'] != null) {
-        message =
-            data['message'].toString();
+      if (data is Map && data['message'] != null) {
+        message = data['message'].toString();
       }
     } catch (_) {}
 
-    throw Exception(
-      '$message (${response.statusCode})',
-    );
+    throw Exception('$message (${response.statusCode})');
   }
 
   // ------------------------------------------------------------
@@ -1298,33 +976,20 @@ class ApiService {
   // DELETE /api/medical-records/:id
   // ------------------------------------------------------------
 
-  static Future<bool>
-      deleteMedicalRecord(
-    String id,
-  ) async {
-    final token =
-        await TokenManager.getToken();
+  static Future<bool> deleteMedicalRecord(String id) async {
+    final token = await TokenManager.getToken();
 
     final recordId = id.trim();
 
     if (recordId.isEmpty) {
-      throw Exception(
-        'ID hồ sơ bệnh án không hợp lệ',
-      );
+      throw Exception('ID hồ sơ bệnh án không hợp lệ');
     }
 
-    final response =
-        await http.delete(
-      Uri.parse(
-        '$baseUrl/medical-records/$recordId',
-      ),
+    final response = await http.delete(
+      Uri.parse('$baseUrl/medical-records/$recordId'),
       headers: {
-        'Content-Type':
-            'application/json',
-        if (token != null &&
-            token.isNotEmpty)
-          'Authorization':
-              'Bearer $token',
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
       },
     );
 
@@ -1332,22 +997,90 @@ class ApiService {
       return true;
     }
 
-    String message =
-        'Không thể xóa hồ sơ bệnh án';
+    String message = 'Không thể xóa hồ sơ bệnh án';
 
     try {
-      final data =
-          jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-      if (data is Map &&
-          data['message'] != null) {
-        message =
-            data['message'].toString();
+      if (data is Map && data['message'] != null) {
+        message = data['message'].toString();
       }
     } catch (_) {}
 
-    throw Exception(
-      '$message (${response.statusCode})',
+    throw Exception('$message (${response.statusCode})');
+  }
+
+  // ============================================================
+  // QUẢN LÝ ĐÁNH GIÁ (ADMIN REVIEWS)
+  // ============================================================
+  static Future<List<dynamic>> getAdminReviews({
+    String? doctorId,
+    int? rating,
+  }) async {
+    final token = await TokenManager.getToken();
+    String query = '';
+    if (doctorId != null && doctorId.isNotEmpty) query += 'doctorId=$doctorId&';
+    if (rating != null) query += 'rating=$rating&';
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/reviews/admin/all?$query'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
     );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+    throw Exception('Không thể lấy danh sách đánh giá');
+  }
+
+  static Future<void> adminCreateReview(Map<String, dynamic> data) async {
+    final token = await TokenManager.getToken();
+    final response = await http.post(
+      Uri.parse('$baseUrl/reviews/admin'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(data),
+    );
+
+    if (response.statusCode != 201) {
+      final res = jsonDecode(response.body);
+      throw Exception(res['message'] ?? 'Thêm đánh giá thất bại');
+    }
+  }
+
+  static Future<void> adminDeleteReview(String id) async {
+    final token = await TokenManager.getToken();
+    final response = await http.delete(
+      Uri.parse('$baseUrl/reviews/admin/$id'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Xóa đánh giá thất bại');
+    }
+  }
+
+  static Future<void> adminReplyReview(String id, String replyComment) async {
+    final token = await TokenManager.getToken();
+    final response = await http.post(
+      Uri.parse('$baseUrl/reviews/admin/$id/reply'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'replyComment': replyComment}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Gửi phản hồi thất bại');
+    }
   }
 }
