@@ -37,10 +37,7 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
     setState(() => loading = true);
     try {
       // 1. Gọi API lấy toàn bộ danh sách lịch hẹn
-      final raw = await ApiService.get(
-        '/appointments',
-        token: auth.token,
-      );
+      final raw = await ApiService.get('/appointments', token: auth.token);
       final list = raw is List ? raw : <dynamic>[];
 
       // 2. Lọc chỉ lấy các lịch hẹn của Bác sĩ đang đăng nhập
@@ -52,7 +49,8 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
         String? docUserId;
         if (doctorData is Map) {
           if (doctorData['userId'] is Map) {
-            docUserId = doctorData['userId']['_id'] ?? doctorData['userId']['id'];
+            docUserId =
+                doctorData['userId']['_id'] ?? doctorData['userId']['id'];
           } else {
             docUserId = doctorData['userId'] ?? doctorData['_id'];
           }
@@ -84,18 +82,18 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
   Future<void> updateStatus(String id, String newStatus) async {
     try {
       final token = context.read<AuthProvider>().token;
-      await ApiService.patch(
-        '/appointments/$id/status',
-        {'status': newStatus},
-        token: token,
-      );
+      await ApiService.patch('/appointments/$id/status', {
+        'status': newStatus,
+      }, token: token);
       await load();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(newStatus == 'CONFIRMED'
-                ? 'Đã xác nhận lịch hẹn.'
-                : 'Đã hoàn thành ca khám.'),
+            content: Text(
+              newStatus == 'CONFIRMED'
+                  ? 'Đã xác nhận lịch hẹn.'
+                  : 'Đã hoàn thành ca khám.',
+            ),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -103,11 +101,7 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              e.toString().replaceFirst('Exception: ', ''),
-            ),
-          ),
+          SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
         );
       }
     }
@@ -117,11 +111,7 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
   Future<void> cancel(String id) async {
     try {
       final token = context.read<AuthProvider>().token;
-      await ApiService.patch(
-        '/appointments/$id/cancel',
-        {},
-        token: token,
-      );
+      await ApiService.patch('/appointments/$id/cancel', {}, token: token);
       await load();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -134,14 +124,249 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              e.toString().replaceFirst('Exception: ', ''),
-            ),
-          ),
+          SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
         );
       }
     }
+  }
+
+  // Dialog Tạo Bệnh Án
+  void _showCreateMedicalRecordDialog(
+    String patientId,
+    String doctorId, // ID của Doctor model
+    String appointmentId,
+    String patientName,
+  ) {
+    final diagnosisController = TextEditingController();
+    final prescriptionController = TextEditingController();
+    final notesController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          'Tạo bệnh án - $patientName',
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: diagnosisController,
+                decoration: InputDecoration(
+                  labelText: 'Chẩn đoán *',
+                  hintText: 'Nhập chẩn đoán bệnh...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                maxLines: 2,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: prescriptionController,
+                decoration: InputDecoration(
+                  labelText: 'Đơn thuốc / Đơn điều trị',
+                  hintText: 'Tên thuốc, liều dùng...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: notesController,
+                decoration: InputDecoration(
+                  labelText: 'Ghi chú thêm',
+                  hintText: 'Lời khuyên, dặn dò...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                maxLines: 2,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xff0284C7),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () async {
+              if (diagnosisController.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Vui lòng nhập chẩn đoán!')),
+                );
+                return;
+              }
+
+              try {
+                final auth = context.read<AuthProvider>();
+                final token = auth.token;
+
+                await ApiService.post(
+                  '/medical-records',
+                  {
+                    'patientId': patientId,
+                    'doctorId': doctorId,
+                    'appointmentId': appointmentId,
+                    'diagnosis': diagnosisController.text.trim(),
+                    'prescription': prescriptionController.text.trim(),
+                    'notes': notesController.text.trim(),
+                  },
+                  token: token,
+                );
+
+                if (ctx.mounted) Navigator.pop(ctx);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Tạo hồ sơ bệnh án thành công!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Lỗi: ${e.toString().replaceFirst('Exception: ', '')}',
+                      ),
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text(
+              'Lưu bệnh án',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Modal Xem Lịch Sử Bệnh Án
+  void _showMedicalRecordsHistory(String patientId, String patientName) async {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        final token = context.read<AuthProvider>().token;
+
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.7,
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Lịch sử bệnh án - $patientName',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const Divider(height: 24),
+              Expanded(
+                child: FutureBuilder(
+                  future: ApiService.get(
+                    '/medical-records/patient/$patientId',
+                    token: token,
+                  ),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return const Center(child: Text('Chưa có lịch sử bệnh án.'));
+                    }
+
+                    final data = snapshot.data;
+                    List records = data is List
+                        ? data
+                        : (data is Map && data['data'] is List
+                            ? data['data']
+                            : []);
+
+                    if (records.isEmpty) {
+                      return const Center(
+                        child: Text('Bệnh nhân chưa có hồ sơ bệnh án nào.'),
+                      );
+                    }
+
+                    return ListView.separated(
+                      itemCount: records.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 10),
+                      itemBuilder: (context, i) {
+                        final item = records[i];
+                        return Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: const Color(0xffF8FAFC),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: const Color(0xffE2E8F0)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Chẩn đoán: ${item['diagnosis'] ?? 'Không có'}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                              ),
+                              if (item['prescription'] != null &&
+                                  item['prescription'].toString().isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    'Đơn thuốc: ${item['prescription']}',
+                                    style: const TextStyle(
+                                      color: Color(0xff0369A1),
+                                    ),
+                                  ),
+                                ),
+                              if (item['notes'] != null &&
+                                  item['notes'].toString().isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 4),
+                                  child: Text(
+                                    'Ghi chú: ${item['notes']}',
+                                    style: const TextStyle(color: Colors.grey),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Color statusColor(String status) {
@@ -176,10 +401,7 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
         children: [
           const Text(
             'Lịch khám bệnh nhân',
-            style: TextStyle(
-              fontSize: 25,
-              fontWeight: FontWeight.w800,
-            ),
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 6),
           const Text(
@@ -204,14 +426,8 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
                     color: Color(0xff94A3B8),
                   ),
                   const SizedBox(height: 10),
-                  Text(
-                    error!,
-                    textAlign: TextAlign.center,
-                  ),
-                  TextButton(
-                    onPressed: load,
-                    child: const Text('Thử lại'),
-                  ),
+                  Text(error!, textAlign: TextAlign.center),
+                  TextButton(onPressed: load, child: const Text('Thử lại')),
                 ],
               ),
             )
@@ -244,19 +460,36 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
           else
             ...items.map((a) {
               final id = a['_id'] ?? a['id'] ?? '';
+              
+              // 1. Trích xuất Doctor ID chính xác từ Doctor Profile
+              final doctorData = a['doctorId'];
+              String rawDoctorId = '';
+              if (doctorData is Map) {
+                rawDoctorId = doctorData['_id'] ?? doctorData['id'] ?? '';
+              } else if (doctorData is String) {
+                rawDoctorId = doctorData;
+              }
+
+              // 2. Trích xuất Patient info
               final patient = a['patientId'];
+              String patientId = '';
               String patientName = 'Bệnh nhân';
               String phone = '';
 
               if (patient is Map) {
+                patientId = patient['_id'] ?? patient['id'] ?? '';
                 patientName = patient['fullName'] ?? 'Bệnh nhân';
                 phone = patient['phoneNumber'] ?? patient['phone'] ?? '';
+              } else if (patient is String) {
+                patientId = patient;
               }
 
               final date = a['date'] ?? '';
               final timeSlot = a['timeSlot'] ?? a['time'] ?? 'Chưa xếp giờ';
               final reason = a['reason'] ?? '';
-              final status = (a['status'] ?? 'PENDING').toString().toUpperCase();
+              final status = (a['status'] ?? 'PENDING')
+                  .toString()
+                  .toUpperCase();
 
               return Container(
                 margin: const EdgeInsets.only(bottom: 12),
@@ -357,12 +590,10 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
                         padding: const EdgeInsets.only(top: 10),
                         child: Text(
                           'Lý do: $reason',
-                          style: const TextStyle(
-                            color: Color(0xff64748B),
-                          ),
+                          style: const TextStyle(color: Color(0xff64748B)),
                         ),
                       ),
-                    
+
                     // Thao tác xử lý dành riêng cho Bác sĩ
                     if (status == 'PENDING')
                       Padding(
@@ -391,7 +622,10 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              icon: const Icon(Icons.check_circle_outline, size: 18),
+                              icon: const Icon(
+                                Icons.check_circle_outline,
+                                size: 18,
+                              ),
                               label: const Text('Xác nhận'),
                             ),
                           ],
@@ -400,8 +634,10 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
                     else if (status == 'CONFIRMED')
                       Padding(
                         padding: const EdgeInsets.only(top: 12),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                        child: Wrap(
+                          alignment: WrapAlignment.end,
+                          spacing: 8,
+                          runSpacing: 8,
                           children: [
                             TextButton.icon(
                               onPressed: () => cancel(id),
@@ -410,11 +646,35 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
                                 color: Color(0xffDC2626),
                               ),
                               label: const Text(
-                                'Hủy lịch',
+                                'Hủy',
                                 style: TextStyle(color: Color(0xffDC2626)),
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            OutlinedButton.icon(
+                              onPressed: () => _showMedicalRecordsHistory(
+                                patientId,
+                                patientName,
+                              ),
+                              icon: const Icon(Icons.history_edu_rounded, size: 16),
+                              label: const Text('Lịch sử BA'),
+                            ),
+                            ElevatedButton.icon(
+                              onPressed: () => _showCreateMedicalRecordDialog(
+                                patientId,
+                                rawDoctorId, // 👈 Đã bổ sung rawDoctorId
+                                id,
+                                patientName,
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xff0284C7),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              icon: const Icon(Icons.note_add_rounded, size: 16),
+                              label: const Text('Tạo BA'),
+                            ),
                             ElevatedButton.icon(
                               onPressed: () => updateStatus(id, 'COMPLETED'),
                               style: ElevatedButton.styleFrom(
@@ -424,8 +684,46 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              icon: const Icon(Icons.task_alt_rounded, size: 18),
+                              icon: const Icon(
+                                Icons.task_alt_rounded,
+                                size: 16,
+                              ),
                               label: const Text('Hoàn thành'),
+                            ),
+                          ],
+                        ),
+                      )
+                    else if (status == 'COMPLETED')
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            OutlinedButton.icon(
+                              onPressed: () => _showMedicalRecordsHistory(
+                                patientId,
+                                patientName,
+                              ),
+                              icon: const Icon(Icons.history_edu_rounded, size: 16),
+                              label: const Text('Lịch sử BA'),
+                            ),
+                            const SizedBox(width: 8),
+                            ElevatedButton.icon(
+                              onPressed: () => _showCreateMedicalRecordDialog(
+                                patientId,
+                                rawDoctorId, // 👈 Đã bổ sung rawDoctorId
+                                id,
+                                patientName,
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xff0284C7),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              icon: const Icon(Icons.note_add_rounded, size: 16),
+                              label: const Text('Tạo BA'),
                             ),
                           ],
                         ),
