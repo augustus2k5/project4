@@ -10,6 +10,7 @@ import 'admin_doctors.dart';
 import 'admin_specialties.dart';
 import 'admin_patients.dart';
 import 'admin_appointments.dart';
+import 'admin_medical_records.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -29,7 +30,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
   // 3 = Chuyên khoa
   // 4 = Bệnh nhân
   // 5 = Lịch hẹn
-  // 6 = Đăng xuất
+  // 6 = Hồ sơ bệnh án
+  // 7 = Đăng xuất
   //
 
   int selectedIndex = 0;
@@ -74,7 +76,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
         loading = false;
       });
 
-      debugPrint('Lỗi lấy danh sách người dùng: $e');
+      debugPrint(
+        'Lỗi lấy danh sách người dùng: $e',
+      );
     }
   }
 
@@ -88,19 +92,25 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   int get totalDoctors {
     return users
-        .where((user) => user.role == 'DOCTOR')
+        .where(
+          (user) => user.role == 'DOCTOR',
+        )
         .length;
   }
 
   int get totalPatients {
     return users
-        .where((user) => user.role == 'PATIENT')
+        .where(
+          (user) => user.role == 'PATIENT',
+        )
         .length;
   }
 
   int get blockedUsers {
     return users
-        .where((user) => user.status == 'BLOCKED')
+        .where(
+          (user) => user.status == 'BLOCKED',
+        )
         .length;
   }
 
@@ -153,6 +163,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
         return const AdminAppointments();
 
       // ----------------------------------------------------------
+      // 6 - HỒ SƠ BỆNH ÁN
+      // ----------------------------------------------------------
+
+      case 6:
+        return const AdminMedicalRecords();
+
+      // ----------------------------------------------------------
       // MẶC ĐỊNH
       // ----------------------------------------------------------
 
@@ -186,6 +203,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
         return 'Quản lý lịch hẹn';
 
       case 6:
+        return 'Quản lý hồ sơ bệnh án';
+
+      case 7:
         return 'Đăng xuất';
 
       default:
@@ -213,7 +233,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               // ĐĂNG XUẤT
               // --------------------------------------------------
 
-              if (index == 6) {
+              if (index == 7) {
                 _logout();
                 return;
               }
@@ -584,12 +604,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
   // ============================================================
 
   void _logout() {
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-      content: Text(
-        'Đã đăng xuất',
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Đã đăng xuất',
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 }
