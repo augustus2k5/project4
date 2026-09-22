@@ -48,82 +48,108 @@ class AdminSidebar extends StatelessWidget {
 
           const Divider(
             color: Colors.white24,
+            height: 1,
           ),
 
           // ============================================================
-          // DASHBOARD
+          // DANH SÁCH MENU
           // ============================================================
-          _menuItem(
-            icon: Icons.dashboard,
-            title: 'Dashboard',
-            index: 0,
-          ),
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  // ======================================================
+                  // DASHBOARD
+                  // ======================================================
+                  _menuItem(
+                    icon: Icons.dashboard,
+                    title: 'Dashboard',
+                    index: 0,
+                  ),
 
-          // ============================================================
-          // NGƯỜI DÙNG
-          // ============================================================
-          _menuItem(
-            icon: Icons.people,
-            title: 'Người dùng',
-            index: 1,
-          ),
+                  // ======================================================
+                  // NGƯỜI DÙNG
+                  // ======================================================
+                  _menuItem(
+                    icon: Icons.people,
+                    title: 'Người dùng',
+                    index: 1,
+                  ),
 
-          // ============================================================
-          // BÁC SĨ
-          // ============================================================
-          _menuItem(
-            icon: Icons.medical_services,
-            title: 'Bác sĩ',
-            index: 2,
-          ),
+                  // ======================================================
+                  // BÁC SĨ
+                  // ======================================================
+                  _menuItem(
+                    icon: Icons.medical_services,
+                    title: 'Bác sĩ',
+                    index: 2,
+                  ),
 
-          // ============================================================
-          // CHUYÊN KHOA
-          // ============================================================
-          _menuItem(
-            icon: Icons.local_hospital,
-            title: 'Chuyên khoa',
-            index: 3,
-          ),
+                  // ======================================================
+                  // CHUYÊN KHOA
+                  // ======================================================
+                  _menuItem(
+                    icon: Icons.local_hospital,
+                    title: 'Chuyên khoa',
+                    index: 3,
+                  ),
 
-          // ============================================================
-          // BỆNH NHÂN
-          // ============================================================
-          _menuItem(
-            icon: Icons.personal_injury,
-            title: 'Bệnh nhân',
-            index: 4,
-          ),
+                  // ======================================================
+                  // BỆNH NHÂN
+                  // ======================================================
+                  _menuItem(
+                    icon: Icons.personal_injury,
+                    title: 'Bệnh nhân',
+                    index: 4,
+                  ),
 
-          // ============================================================
-          // LỊCH HẸN
-          // ============================================================
-          _menuItem(
-            icon: Icons.calendar_month,
-            title: 'Lịch hẹn',
-            index: 5,
-          ),
+                  // ======================================================
+                  // LỊCH HẸN
+                  // ======================================================
+                  _menuItem(
+                    icon: Icons.calendar_month,
+                    title: 'Lịch hẹn',
+                    index: 5,
+                  ),
 
-          const Spacer(),
+                  // ======================================================
+                  // HỒ SƠ BỆNH ÁN
+                  // ======================================================
+                  _menuItem(
+                    icon: Icons.medical_information,
+                    title: 'Hồ sơ bệnh án',
+                    index: 6,
+                  ),
+                ],
+              ),
+            ),
+          ),
 
           // ============================================================
           // ĐĂNG XUẤT
           // ============================================================
-          _menuItem(
-            icon: Icons.logout,
-            title: 'Đăng xuất',
-            index: 6,
-            onLogout: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AdminLoginScreen(),
-                ),
-              );
-            },
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                bottom: 8,
+              ),
+              child: _menuItem(
+                icon: Icons.logout,
+                title: 'Đăng xuất',
+                index: 7,
+                onLogout: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AdminLoginScreen(),
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
-
-          const SizedBox(height: 20),
         ],
       ),
     );
@@ -176,11 +202,14 @@ class AdminSidebar extends StatelessWidget {
 
             const SizedBox(width: 15),
 
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 15,
+            Expanded(
+              child: Text(
+                title,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                ),
               ),
             ),
           ],
