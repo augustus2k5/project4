@@ -28,11 +28,7 @@ class AdminSidebar extends StatelessWidget {
             child: const Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.local_hospital,
-                  color: Colors.white,
-                  size: 35,
-                ),
+                Icon(Icons.local_hospital, color: Colors.white, size: 35),
                 SizedBox(height: 5),
                 Text(
                   'MEDICAL ADMIN',
@@ -46,10 +42,7 @@ class AdminSidebar extends StatelessWidget {
             ),
           ),
 
-          const Divider(
-            color: Colors.white24,
-            height: 1,
-          ),
+          const Divider(color: Colors.white24, height: 1),
 
           // ============================================================
           // DANH SÁCH MENU
@@ -71,11 +64,7 @@ class AdminSidebar extends StatelessWidget {
                   // ======================================================
                   // NGƯỜI DÙNG
                   // ======================================================
-                  _menuItem(
-                    icon: Icons.people,
-                    title: 'Người dùng',
-                    index: 1,
-                  ),
+                  _menuItem(icon: Icons.people, title: 'Người dùng', index: 1),
 
                   // ======================================================
                   // BÁC SĨ
@@ -121,6 +110,12 @@ class AdminSidebar extends StatelessWidget {
                     title: 'Hồ sơ bệnh án',
                     index: 6,
                   ),
+                  // ĐÁNH GIÁ
+                  _menuItem(
+                    icon: Icons.rate_review,
+                    title: 'Đánh giá',
+                    index: 7,
+                  ),
                 ],
               ),
             ),
@@ -132,13 +127,11 @@ class AdminSidebar extends StatelessWidget {
           SafeArea(
             top: false,
             child: Padding(
-              padding: const EdgeInsets.only(
-                bottom: 8,
-              ),
+              padding: const EdgeInsets.only(bottom: 8),
               child: _menuItem(
                 icon: Icons.logout,
                 title: 'Đăng xuất',
-                index: 7,
+                index: 8,
                 onLogout: () {
                   Navigator.pushReplacement(
                     context,
@@ -178,14 +171,8 @@ class AdminSidebar extends StatelessWidget {
         onItemSelected(index);
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(
-          horizontal: 10,
-          vertical: 4,
-        ),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 15,
-          vertical: 14,
-        ),
+        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
         decoration: BoxDecoration(
           color: selected
               ? Colors.white.withValues(alpha: 0.18)
@@ -194,11 +181,7 @@ class AdminSidebar extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: Colors.white,
-              size: 22,
-            ),
+            Icon(icon, color: Colors.white, size: 22),
 
             const SizedBox(width: 15),
 
@@ -206,10 +189,7 @@ class AdminSidebar extends StatelessWidget {
               child: Text(
                 title,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                ),
+                style: const TextStyle(color: Colors.white, fontSize: 15),
               ),
             ),
           ],

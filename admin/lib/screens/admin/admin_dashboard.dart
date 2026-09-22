@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'admin_reviews.dart';
 import '../../widgets/admin_sidebar.dart';
 import '../../widgets/admin_stat_card.dart';
 import '../../models/user_model.dart';
@@ -76,9 +76,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         loading = false;
       });
 
-      debugPrint(
-        'Lỗi lấy danh sách người dùng: $e',
-      );
+      debugPrint('Lỗi lấy danh sách người dùng: $e');
     }
   }
 
@@ -91,27 +89,15 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   int get totalDoctors {
-    return users
-        .where(
-          (user) => user.role == 'DOCTOR',
-        )
-        .length;
+    return users.where((user) => user.role == 'DOCTOR').length;
   }
 
   int get totalPatients {
-    return users
-        .where(
-          (user) => user.role == 'PATIENT',
-        )
-        .length;
+    return users.where((user) => user.role == 'PATIENT').length;
   }
 
   int get blockedUsers {
-    return users
-        .where(
-          (user) => user.status == 'BLOCKED',
-        )
-        .length;
+    return users.where((user) => user.status == 'BLOCKED').length;
   }
 
   // ============================================================
@@ -168,7 +154,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
       case 6:
         return const AdminMedicalRecords();
-
+      case 7:
+        return const AdminReviewsScreen();
       // ----------------------------------------------------------
       // MẶC ĐỊNH
       // ----------------------------------------------------------
@@ -206,8 +193,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
         return 'Quản lý hồ sơ bệnh án';
 
       case 7:
-        return 'Đăng xuất';
-
+        return 'Quản lý đánh giá & phản hồi';
+      case 8:
+        return 'Đăng xuất'; // <--- THÊM CASE 8
       default:
         return 'Dashboard';
     }
@@ -233,7 +221,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               // ĐĂNG XUẤT
               // --------------------------------------------------
 
-              if (index == 7) {
+              if (index == 8) {
                 _logout();
                 return;
               }
@@ -251,7 +239,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
           // ======================================================
           // KHU VỰC NỘI DUNG
           // ======================================================
-
           Expanded(
             child: Column(
               children: [
@@ -261,9 +248,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
                 Container(
                   height: 70,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 25,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     boxShadow: [
@@ -293,13 +278,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       // ------------------------------------------------
                       // THÔNG BÁO
                       // ------------------------------------------------
-
                       IconButton(
                         onPressed: () {},
-                        icon: const Icon(
-                          Icons.notifications_none,
-                          size: 27,
-                        ),
+                        icon: const Icon(Icons.notifications_none, size: 27),
                       ),
 
                       const SizedBox(width: 10),
@@ -307,14 +288,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       // ------------------------------------------------
                       // AVATAR
                       // ------------------------------------------------
-
                       const CircleAvatar(
                         radius: 20,
                         backgroundColor: Colors.blue,
-                        child: Icon(
-                          Icons.person,
-                          color: Colors.white,
-                        ),
+                        child: Icon(Icons.person, color: Colors.white),
                       ),
 
                       const SizedBox(width: 10),
@@ -322,7 +299,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       // ------------------------------------------------
                       // TÊN ADMIN
                       // ------------------------------------------------
-
                       const Text(
                         'Admin',
                         style: TextStyle(
@@ -339,14 +315,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 // ==================================================
                 // BODY
                 // ==================================================
-
                 Expanded(
                   child: Container(
                     color: const Color(0xFFF5F7FA),
                     child: loading && selectedIndex == 0
-                        ? const Center(
-                            child: CircularProgressIndicator(),
-                          )
+                        ? const Center(child: CircularProgressIndicator())
                         : getCurrentPage(),
                   ),
                 ),
@@ -374,20 +347,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
           const Text(
             'Xin chào, Admin 👋',
-            style: TextStyle(
-              fontSize: 25,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
 
           const SizedBox(height: 8),
 
           const Text(
             'Tổng quan hệ thống quản lý bệnh viện',
-            style: TextStyle(
-              color: Colors.grey,
-              fontSize: 14,
-            ),
+            style: TextStyle(color: Colors.grey, fontSize: 14),
           ),
 
           const SizedBox(height: 25),
@@ -395,7 +362,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
           // ========================================================
           // THẺ THỐNG KÊ
           // ========================================================
-
           GridView.count(
             crossAxisCount: 4,
             crossAxisSpacing: 15,
@@ -417,7 +383,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
               // ----------------------------------------------------
               // BÁC SĨ
               // ----------------------------------------------------
-
               AdminStatCard(
                 title: 'Bác sĩ',
                 value: totalDoctors.toString(),
@@ -427,7 +392,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
               // ----------------------------------------------------
               // BỆNH NHÂN
               // ----------------------------------------------------
-
               AdminStatCard(
                 title: 'Bệnh nhân',
                 value: totalPatients.toString(),
@@ -437,7 +401,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
               // ----------------------------------------------------
               // TÀI KHOẢN BỊ KHÓA
               // ----------------------------------------------------
-
               AdminStatCard(
                 title: 'Bị khóa',
                 value: blockedUsers.toString(),
@@ -451,13 +414,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
           // ========================================================
           // NGƯỜI DÙNG GẦN ĐÂY
           // ========================================================
-
           const Text(
             'Người dùng gần đây',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
 
           const SizedBox(height: 15),
@@ -465,7 +424,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
           // ========================================================
           // BẢNG USER
           // ========================================================
-
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
@@ -478,9 +436,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     child: Center(
                       child: Text(
                         'Chưa có người dùng',
-                        style: TextStyle(
-                          color: Colors.grey,
-                        ),
+                        style: TextStyle(color: Colors.grey),
                       ),
                     ),
                   )
@@ -495,48 +451,37 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         DataColumn(
                           label: Text(
                             'Họ tên',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
 
                         // ------------------------------------------------
                         // EMAIL
                         // ------------------------------------------------
-
                         DataColumn(
                           label: Text(
                             'Email',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
 
                         // ------------------------------------------------
                         // VAI TRÒ
                         // ------------------------------------------------
-
                         DataColumn(
                           label: Text(
                             'Vai trò',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
 
                         // ------------------------------------------------
                         // TRẠNG THÁI
                         // ------------------------------------------------
-
                         DataColumn(
                           label: Text(
                             'Trạng thái',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
@@ -547,36 +492,21 @@ class _AdminDashboardState extends State<AdminDashboard> {
                             // HỌ TÊN
                             // --------------------------------------------
 
-                            DataCell(
-                              Text(
-                                user.fullName,
-                              ),
-                            ),
+                            DataCell(Text(user.fullName)),
 
                             // --------------------------------------------
                             // EMAIL
                             // --------------------------------------------
-
-                            DataCell(
-                              Text(
-                                user.email,
-                              ),
-                            ),
+                            DataCell(Text(user.email)),
 
                             // --------------------------------------------
                             // VAI TRÒ
                             // --------------------------------------------
-
-                            DataCell(
-                              Text(
-                                user.role,
-                              ),
-                            ),
+                            DataCell(Text(user.role)),
 
                             // --------------------------------------------
                             // TRẠNG THÁI
                             // --------------------------------------------
-
                             DataCell(
                               Text(
                                 user.status,
@@ -604,12 +534,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
   // ============================================================
 
   void _logout() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Đã đăng xuất',
-        ),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Đã đăng xuất')));
   }
 }
