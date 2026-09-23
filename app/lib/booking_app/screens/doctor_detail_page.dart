@@ -94,21 +94,42 @@ class _DoctorDetailPageState extends State<DoctorDetailPage> {
                   style: const TextStyle(color: Colors.white70, fontSize: 15),
                 ),
                 const SizedBox(height: 14),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 12,
+                  runSpacing: 4,
                   children: [
-                    const Icon(Icons.star_rounded, color: Color(0xffffd166)),
-                    Text(
-                      ' ${rating.toStringAsFixed(1)} ($totalReviews đánh giá)',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.star_rounded,
+                          color: Color(0xffffd166),
+                          size: 20,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${rating.toStringAsFixed(1)} ($totalReviews đánh giá)',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      width: 4,
+                      height: 4,
+                      decoration: const BoxDecoration(
+                        color: Colors.white60,
+                        shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(width: 20),
                     Text(
                       '${doctor.experienceYears} năm kinh nghiệm',
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
                     ),
                   ],
                 ),
@@ -430,7 +451,7 @@ class _DoctorDetailPageState extends State<DoctorDetailPage> {
                     Icon(Icons.verified, size: 15, color: Color(0xff16A34A)),
                     SizedBox(width: 5),
                     Text(
-                      'Phản hồi từ Phòng khám / Admin',
+                      'Phản hồi từ Phòng khám ',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
