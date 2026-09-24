@@ -215,6 +215,18 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
                 final auth = context.read<AuthProvider>();
                 final token = auth.token;
 
+                final prescriptionInput = prescriptionController.text.trim();
+
+                // Đóng gói mảng prescriptions chuẩn theo định dạng Backend
+                List<Map<String, dynamic>> prescriptionsList = [];
+                if (prescriptionInput.isNotEmpty) {
+                  prescriptionsList.add({
+                    'drugName': prescriptionInput,
+                    'quantity': 1,
+                    'dosage': 'Theo chỉ định của bác sĩ',
+                  });
+                }
+
                 await ApiService.post(
                   '/medical-records',
                   {
@@ -222,7 +234,8 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
                     'doctorId': doctorId,
                     'appointmentId': appointmentId,
                     'diagnosis': diagnosisController.text.trim(),
-                    'prescription': prescriptionController.text.trim(),
+                    'prescriptions': prescriptionsList, // Gửi mảng object chuẩn
+                    'prescription': prescriptionInput,  // Dự phòng dạng string
                     'notes': notesController.text.trim(),
                   },
                   token: token,
@@ -317,6 +330,34 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
                       separatorBuilder: (_, __) => const SizedBox(height: 10),
                       itemBuilder: (context, i) {
                         final item = records[i];
+
+                        // Xử lý đơn thuốc linh hoạt (mảng prescriptions hoặc chuỗi prescription)
+                        String prescriptionText = '';
+                        if (item['prescriptions'] is List &&
+                            (item['prescriptions'] as List).isNotEmpty) {
+                          List pList = item['prescriptions'];
+                          List<String> drugItems = [];
+                          for (var p in pList) {
+                            if (p is Map) {
+                              final name = p['drugName'] ?? p['name'] ?? '';
+                              final quantity = p['quantity'] != null
+                                  ? ' (SL: ${p['quantity']})'
+                                  : '';
+                              final dosage = p['dosage'] != null &&
+                                      p['dosage'].toString().isNotEmpty
+                                  ? ' - ${p['dosage']}'
+                                  : '';
+                              drugItems.add('$name$quantity$dosage');
+                            } else if (p is String) {
+                              drugItems.add(p);
+                            }
+                          }
+                          prescriptionText = drugItems.join('\n');
+                        } else if (item['prescription'] != null &&
+                            item['prescription'].toString().isNotEmpty) {
+                          prescriptionText = item['prescription'].toString();
+                        }
+
                         return Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
@@ -334,12 +375,11 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
                                   fontSize: 15,
                                 ),
                               ),
-                              if (item['prescription'] != null &&
-                                  item['prescription'].toString().isNotEmpty)
+                              if (prescriptionText.isNotEmpty)
                                 Padding(
                                   padding: const EdgeInsets.only(top: 6),
                                   child: Text(
-                                    'Đơn thuốc: ${item['prescription']}',
+                                    'Đơn thuốc:\n$prescriptionText',
                                     style: const TextStyle(
                                       color: Color(0xff0369A1),
                                     ),
@@ -661,7 +701,7 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
                             ElevatedButton.icon(
                               onPressed: () => _showCreateMedicalRecordDialog(
                                 patientId,
-                                rawDoctorId, // 👈 Đã bổ sung rawDoctorId
+                                rawDoctorId,
                                 id,
                                 patientName,
                               ),
@@ -711,7 +751,7 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
                             ElevatedButton.icon(
                               onPressed: () => _showCreateMedicalRecordDialog(
                                 patientId,
-                                rawDoctorId, // 👈 Đã bổ sung rawDoctorId
+                                rawDoctorId,
                                 id,
                                 patientName,
                               ),

@@ -114,6 +114,185 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
         status;
   }
 
+  void _showMedicalRecordDialog(String appointmentId) async {
+    final auth = context.read<AuthProvider>();
+    final user = auth.currentUser;
+    final token = auth.token;
+
+    if (user == null) return;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.assignment_outlined, color: Color(0xff0284C7)),
+            SizedBox(width: 8),
+            Text(
+              'Chi tiết bệnh án',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        content: FutureBuilder(
+          future: ApiService.get(
+            '/medical-records/patient/${user.id}',
+            token: token,
+          ),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const SizedBox(
+                height: 100,
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
+            if (snapshot.hasError || snapshot.data == null) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: Text('Chưa có hồ sơ bệnh án cho lịch hẹn này.'),
+              );
+            }
+
+            final rawData = snapshot.data;
+            List records = [];
+            if (rawData is List) {
+              records = rawData;
+            } else if (rawData is Map && rawData['data'] is List) {
+              records = rawData['data'];
+            }
+
+            if (records.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: Text('Chưa có hồ sơ bệnh án cho lịch hẹn này.'),
+              );
+            }
+
+            // Tìm bệnh án thuộc đúng appointmentId
+            Map<String, dynamic>? record;
+            for (var item in records) {
+              if (item is! Map) continue;
+              final appData = item['appointmentId'];
+              String? appDataId;
+              if (appData is Map) {
+                appDataId = appData['_id'] ?? appData['id'];
+              } else if (appData is String) {
+                appDataId = appData;
+              }
+
+              if (appDataId == appointmentId) {
+                record = Map<String, dynamic>.from(item);
+                break;
+              }
+            }
+
+            if (record == null) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: Text('Chưa có hồ sơ bệnh án cho lịch hẹn này.'),
+              );
+            }
+
+            // Chẩn đoán
+            final diagnosis = record['diagnosis'] ?? 'Chưa cập nhật';
+
+            // Ghi chú
+            final rawNotes = record['notes'] ?? record['note'] ?? record['description'];
+            final notes = (rawNotes != null && rawNotes.toString().trim().isNotEmpty)
+                ? rawNotes.toString()
+                : 'Không có ghi chú';
+
+            // Đơn thuốc (prescriptions)
+            String prescriptionText = 'Không có đơn thuốc';
+            if (record['prescriptions'] is List && (record['prescriptions'] as List).isNotEmpty) {
+              List pList = record['prescriptions'];
+              List<String> items = [];
+              for (var p in pList) {
+                if (p is Map) {
+                  final name = p['drugName'] ?? p['name'] ?? '';
+                  final quantity = p['quantity'] != null ? ' (SL: ${p['quantity']})' : '';
+                  final dosage = p['dosage'] != null && p['dosage'].toString().isNotEmpty
+                      ? '\n  Liều dùng: ${p['dosage']}'
+                      : '';
+                  items.add('• $name$quantity$dosage');
+                } else if (p is String) {
+                  items.add('• $p');
+                }
+              }
+              if (items.isNotEmpty) {
+                prescriptionText = items.join('\n');
+              }
+            } else if (record['prescription'] != null && record['prescription'].toString().trim().isNotEmpty) {
+              prescriptionText = record['prescription'].toString();
+            }
+
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildRecordItem(
+                    'Chẩn đoán',
+                    diagnosis,
+                    Icons.medical_services_outlined,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildRecordItem(
+                    'Đơn thuốc',
+                    prescriptionText,
+                    Icons.medication_outlined,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildRecordItem(
+                    'Ghi chú bác sĩ',
+                    notes,
+                    Icons.note_alt_outlined,
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text(
+              'Đóng',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecordItem(String title, String content, IconData icon) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xffF8FAFC),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xffE2E8F0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 16, color: const Color(0xff0284C7)),
+              const SizedBox(width: 6),
+              Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xff64748B))),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(content, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
@@ -298,39 +477,61 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
                           ),
                         ),
                       ),
-                    // Nếu lịch hẹn đã hoàn thành (COMPLETED), thêm nút Đánh giá:
+                    // Nếu lịch hẹn đã hoàn thành (COMPLETED), hiển thị song song nút "Xem bệnh án" và "Đánh giá buổi khám"
                     if (a.status == 'COMPLETED') ...[
-                      const SizedBox(height: 10),
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton.icon(
-                          onPressed: () {
-                            ReviewBottomSheet.show(
-                              context,
-                              appointmentId: a.id,
-                              doctorName: a.doctorName,
-                              onSubmitted: () => load(),
-                            );
-                          },
-                          icon: const Icon(
-                            Icons.star_rate_rounded,
-                            color: Color(0xffffb703),
-                            size: 20,
-                          ),
-                          label: const Text(
-                            'Đánh giá buổi khám',
-                            style: TextStyle(
-                              color: Color(0xff0284C7),
-                              fontWeight: FontWeight.bold,
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () => _showMedicalRecordDialog(a.id),
+                              icon: const Icon(Icons.assignment_outlined, size: 18),
+                              label: const Text(
+                                'Xem bệnh án',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xff0284C7),
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
                             ),
                           ),
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xff0284C7)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                ReviewBottomSheet.show(
+                                  context,
+                                  appointmentId: a.id,
+                                  doctorName: a.doctorName,
+                                  onSubmitted: () => load(),
+                                );
+                              },
+                              icon: const Icon(
+                                Icons.star_rate_rounded,
+                                color: Color(0xffffb703),
+                                size: 18,
+                              ),
+                              label: const Text(
+                                'Đánh giá',
+                                style: TextStyle(
+                                  color: Color(0xff0284C7),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: Color(0xff0284C7)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ),
                     ],
                   ],
