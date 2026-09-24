@@ -89,7 +89,8 @@ class AuthProvider extends ChangeNotifier {
     _isLoading = false;
 
     // 👈 SỬA DÒNG NÀY: Kiểm tra nếu có result['token'] HOẶC result['success'] == true
-    final bool isSuccess = (result['token'] != null) || (result['success'] == true);
+    final bool isSuccess =
+        (result['token'] != null) || (result['success'] == true);
 
     if (isSuccess) {
       _token = result['token'];
@@ -111,11 +112,13 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-
   /// Đăng xuất
-  void logout() {
+  Future<void> logout() async {
     _currentUser = null;
     _token = null;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token');
+    await prefs.remove('user_data');
     notifyListeners();
   }
 
@@ -152,6 +155,26 @@ class AuthProvider extends ChangeNotifier {
     } else {
       _errorMessage = result['message'];
       notifyListeners();
+      return false;
+    }
+  }
+
+  /// Kiểm tra tự động đăng nhập khi mở app
+  Future<bool> tryAutoLogin() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (!prefs.containsKey('token') || !prefs.containsKey('user_data')) {
+        return false;
+      }
+      final savedToken = prefs.getString('token');
+      final userDataStr = prefs.getString('user_data');
+      if (savedToken == null || userDataStr == null) return false;
+      final userData = jsonDecode(userDataStr);
+      _token = savedToken;
+      _currentUser = UserModels.fromJson(userData);
+      notifyListeners();
+      return true;
+    } catch (_) {
       return false;
     }
   }
