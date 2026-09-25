@@ -1,0 +1,96 @@
+[{
+  "_id": {
+    "$oid": "6aa783775aff1d19b337f2fe"
+  },
+  "userId": {
+    "$oid": "6aa66a9f04cc96bbf2e08b38"
+  },
+  "patientCode": "b90223",
+  "dateOfBirth": {
+    "$date": "2000-01-21T00:00:00.000Z"
+  },
+  "gender": "MALE",
+  "identityCard": "0402423343243",
+  "address": "Cầu giấy - Hà nội",
+  "medicalHistory": "ung thư",
+  "allergies": "di ứng da",
+  "createdAt": {
+    "$date": "2026-09-14T05:17:43.403Z"
+  },
+  "updatedAt": {
+    "$date": "2026-09-25T04:20:16.868Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ab12bb8eeb302884c45a823"
+  },
+  "userId": {
+    "$oid": "6aa66e583228ad069911c1ff"
+  },
+  "patientCode": "B0911",
+  "dateOfBirth": {
+    "$date": "2000-01-26T17:00:00.000Z"
+  },
+  "gender": "MALE",
+  "identityCard": "099282347888",
+  "address": "Hà đông - Hà nội",
+  "medicalHistory": "dị ứng",
+  "allergies": "thời tiết",
+  "createdAt": {
+    "$date": "2026-09-21T13:06:00.359Z"
+  },
+  "updatedAt": {
+    "$date": "2026-09-25T04:19:36.686Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ab5f62d93c7281ab08f717e"
+  },
+  "userId": {
+    "$oid": "6a9a59764acf671a2322b88d"
+  },
+  "patientCode": "B9001",
+  "dateOfBirth": {
+    "$date": "2000-01-21T17:00:00.000Z"
+  },
+  "gender": "MALE",
+  "identityCard": "04646366432",
+  "address": "Cẩm thuỷ - Thanh hoá",
+  "medicalHistory": "",
+  "allergies": "",
+  "createdAt": {
+    "$date": "2026-09-25T04:18:53.623Z"
+  },
+  "updatedAt": {
+    "$date": "2026-09-25T04:18:53.623Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ab5f6ab93c7281ab08f717f"
+  },
+  "userId": {
+    "$oid": "6ab3495e720b44d6bad7d76d"
+  },
+  "patientCode": "B09223",
+  "dateOfBirth": {
+    "$date": "2000-01-17T17:00:00.000Z"
+  },
+  "gender": "MALE",
+  "identityCard": "072535512313",
+  "address": "Đô lương - Nghệ an",
+  "medicalHistory": "",
+  "allergies": "",
+  "createdAt": {
+    "$date": "2026-09-25T04:20:59.130Z"
+  },
+  "updatedAt": {
+    "$date": "2026-09-25T04:20:59.130Z"
+  },
+  "__v": 0
+}]
