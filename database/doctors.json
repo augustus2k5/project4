@@ -1,0 +1,92 @@
+[{
+  "_id": {
+    "$oid": "6aa449301d4da928f053853c"
+  },
+  "userId": {
+    "$oid": "6aa448cc1d4da928f053853b"
+  },
+  "specialtyId": {
+    "$oid": "6ab5f53b93c7281ab08f717a"
+  },
+  "price": 1000000,
+  "bio": "có kinh nghiệm 12",
+  "experienceYears": 7,
+  "createdAt": {
+    "$date": "2026-09-11T18:32:16.521Z"
+  },
+  "updatedAt": {
+    "$date": "2026-09-25T04:22:01.921Z"
+  },
+  "__v": 0,
+  "rating": 5,
+  "totalReviews": 0
+},
+{
+  "_id": {
+    "$oid": "6ab5f6e193c7281ab08f718f"
+  },
+  "userId": {
+    "$oid": "6ab4d4279cf66b0370121fa7"
+  },
+  "specialtyId": {
+    "$oid": "6ab5f57f93c7281ab08f717c"
+  },
+  "price": 1200000,
+  "bio": "xinh gái",
+  "experienceYears": 3,
+  "rating": 5,
+  "totalReviews": 1,
+  "createdAt": {
+    "$date": "2026-09-25T04:21:53.735Z"
+  },
+  "updatedAt": {
+    "$date": "2026-09-25T04:27:34.282Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ab5fba893c7281ab08f71f4"
+  },
+  "userId": {
+    "$oid": "6ab5fa8993c7281ab08f71f2"
+  },
+  "specialtyId": {
+    "$oid": "6ab5f52793c7281ab08f7179"
+  },
+  "price": 190000,
+  "bio": "đẹp trai",
+  "experienceYears": 2,
+  "rating": 2,
+  "totalReviews": 1,
+  "createdAt": {
+    "$date": "2026-09-25T04:42:16.766Z"
+  },
+  "updatedAt": {
+    "$date": "2026-09-25T04:46:19.433Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ab5fbcc93c7281ab08f71f5"
+  },
+  "userId": {
+    "$oid": "6ab5fb2c93c7281ab08f71f3"
+  },
+  "specialtyId": {
+    "$oid": "6ab5f4fc93c7281ab08f7178"
+  },
+  "price": 14000,
+  "bio": "xinhgai",
+  "experienceYears": 2,
+  "rating": 4,
+  "totalReviews": 1,
+  "createdAt": {
+    "$date": "2026-09-25T04:42:52.610Z"
+  },
+  "updatedAt": {
+    "$date": "2026-09-25T04:48:19.781Z"
+  },
+  "__v": 0
+}]
