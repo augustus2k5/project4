@@ -36,11 +36,9 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
 
     setState(() => loading = true);
     try {
-      // 1. Gọi API lấy toàn bộ danh sách lịch hẹn
       final raw = await ApiService.get('/appointments', token: auth.token);
       final list = raw is List ? raw : <dynamic>[];
 
-      // 2. Lọc chỉ lấy các lịch hẹn của Bác sĩ đang đăng nhập
       final doctorAppointments = list.where((item) {
         if (item is! Map) return false;
         final doctorData = item['doctorId'];
@@ -78,7 +76,6 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
     }
   }
 
-  // Hàm cập nhật trạng thái lịch hẹn (Xác nhận/Hoàn thành)
   Future<void> updateStatus(String id, String newStatus) async {
     try {
       final token = context.read<AuthProvider>().token;
@@ -107,7 +104,6 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
     }
   }
 
-  // Hàm hủy lịch hẹn phía Bác sĩ
   Future<void> cancel(String id) async {
     try {
       final token = context.read<AuthProvider>().token;
@@ -130,149 +126,268 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
     }
   }
 
-  // Dialog Tạo Bệnh Án
+  // Dialog Tạo Bệnh Án kê được NHIỀU THUỐC
   void _showCreateMedicalRecordDialog(
     String patientId,
-    String doctorId, // ID của Doctor model
+    String doctorId,
     String appointmentId,
     String patientName,
   ) {
     final diagnosisController = TextEditingController();
-    final prescriptionController = TextEditingController();
     final notesController = TextEditingController();
+
+    // Danh sách các dòng thuốc (mỗi dòng gồm 3 controller: drugName, quantity, dosage)
+    List<Map<String, TextEditingController>> medicineRows = [
+      {
+        'name': TextEditingController(),
+        'quantity': TextEditingController(text: '10'),
+        'dosage': TextEditingController(),
+      }
+    ];
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          'Tạo bệnh án - $patientName',
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: diagnosisController,
-                decoration: InputDecoration(
-                  labelText: 'Chẩn đoán *',
-                  hintText: 'Nhập chẩn đoán bệnh...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            title: Text(
+              'Tạo bệnh án - $patientName',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            content: SizedBox(
+              width: 480,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: diagnosisController,
+                      decoration: InputDecoration(
+                        labelText: 'Chẩn đoán *',
+                        hintText: 'Nhập chẩn đoán bệnh...',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      maxLines: 2,
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Danh sách đơn thuốc',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Color(0xff0284C7),
+                          ),
+                        ),
+                        TextButton.icon(
+                          onPressed: () {
+                            setDialogState(() {
+                              medicineRows.add({
+                                'name': TextEditingController(),
+                                'quantity': TextEditingController(text: '10'),
+                                'dosage': TextEditingController(),
+                              });
+                            });
+                          },
+                          icon: const Icon(Icons.add_circle_outline, size: 18),
+                          label: const Text('+ Thêm thuốc'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+
+                    // Duyệt hiển thị danh sách các ô nhập thuốc
+                    ...medicineRows.asMap().entries.map((entry) {
+                      int idx = entry.key;
+                      var row = entry.value;
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xffF8FAFC),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xffE2E8F0)),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    controller: row['name'],
+                                    decoration: InputDecoration(
+                                      labelText: 'Thuốc ${idx + 1}',
+                                      hintText: 'Tên thuốc (ví dụ: Paracetamol)',
+                                      isDense: true,
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                if (medicineRows.length > 1)
+                                  IconButton(
+                                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                                    onPressed: () {
+                                      setDialogState(() {
+                                        medicineRows.removeAt(idx);
+                                      });
+                                    },
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: TextField(
+                                    controller: row['quantity'],
+                                    keyboardType: TextInputType.number,
+                                    decoration: InputDecoration(
+                                      labelText: 'Số lượng',
+                                      hintText: '10',
+                                      isDense: true,
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  flex: 3,
+                                  child: TextField(
+                                    controller: row['dosage'],
+                                    decoration: InputDecoration(
+                                      labelText: 'Liều dùng',
+                                      hintText: 'Uống 1 viên/lần...',
+                                      isDense: true,
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: notesController,
+                      decoration: InputDecoration(
+                        labelText: 'Ghi chú thêm',
+                        hintText: 'Lời khuyên, dặn dò bác sĩ...',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      maxLines: 2,
+                    ),
+                  ],
                 ),
-                maxLines: 2,
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: prescriptionController,
-                decoration: InputDecoration(
-                  labelText: 'Đơn thuốc / Đơn điều trị',
-                  hintText: 'Tên thuốc, liều dùng...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                maxLines: 3,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: notesController,
-                decoration: InputDecoration(
-                  labelText: 'Ghi chú thêm',
-                  hintText: 'Lời khuyên, dặn dò...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff0284C7),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                maxLines: 2,
+                onPressed: () async {
+                  if (diagnosisController.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Vui lòng nhập chẩn đoán!')),
+                    );
+                    return;
+                  }
+
+                  try {
+                    final auth = context.read<AuthProvider>();
+                    final token = auth.token;
+
+                    // Gom toàn bộ danh sách thuốc vừa nhập
+                    List<Map<String, dynamic>> prescriptionsList = [];
+                    List<String> textSummaryList = [];
+
+                    for (var row in medicineRows) {
+                      final name = row['name']!.text.trim();
+                      final quantity = int.tryParse(row['quantity']!.text.trim()) ?? 1;
+                      final dosage = row['dosage']!.text.trim();
+
+                      if (name.isNotEmpty) {
+                        prescriptionsList.add({
+                          'drugName': name,
+                          'quantity': quantity,
+                          'dosage': dosage.isNotEmpty ? dosage : 'Theo chỉ định của bác sĩ',
+                        });
+                        textSummaryList.add('$name (SL: $quantity)');
+                      }
+                    }
+
+                    await ApiService.post(
+                      '/medical-records',
+                      {
+                        'patientId': patientId,
+                        'doctorId': doctorId,
+                        'appointmentId': appointmentId,
+                        'diagnosis': diagnosisController.text.trim(),
+                        'prescriptions': prescriptionsList,
+                        'prescription': textSummaryList.join(', '),
+                        'notes': notesController.text.trim(),
+                      },
+                      token: token,
+                    );
+
+                    if (ctx.mounted) Navigator.pop(ctx);
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Tạo hồ sơ bệnh án thành công!'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Lỗi: ${e.toString().replaceFirst('Exception: ', '')}',
+                          ),
+                        ),
+                      );
+                    }
+                  }
+                },
+                child: const Text(
+                  'Lưu bệnh án',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xff0284C7),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            onPressed: () async {
-              if (diagnosisController.text.trim().isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Vui lòng nhập chẩn đoán!')),
-                );
-                return;
-              }
-
-              try {
-                final auth = context.read<AuthProvider>();
-                final token = auth.token;
-
-                final prescriptionInput = prescriptionController.text.trim();
-
-                // Đóng gói mảng prescriptions chuẩn theo định dạng Backend
-                List<Map<String, dynamic>> prescriptionsList = [];
-                if (prescriptionInput.isNotEmpty) {
-                  prescriptionsList.add({
-                    'drugName': prescriptionInput,
-                    'quantity': 1,
-                    'dosage': 'Theo chỉ định của bác sĩ',
-                  });
-                }
-
-                await ApiService.post(
-                  '/medical-records',
-                  {
-                    'patientId': patientId,
-                    'doctorId': doctorId,
-                    'appointmentId': appointmentId,
-                    'diagnosis': diagnosisController.text.trim(),
-                    'prescriptions': prescriptionsList, // Gửi mảng object chuẩn
-                    'prescription': prescriptionInput,  // Dự phòng dạng string
-                    'notes': notesController.text.trim(),
-                  },
-                  token: token,
-                );
-
-                if (ctx.mounted) Navigator.pop(ctx);
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Tạo hồ sơ bệnh án thành công!'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                }
-              } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Lỗi: ${e.toString().replaceFirst('Exception: ', '')}',
-                      ),
-                    ),
-                  );
-                }
-              }
-            },
-            child: const Text(
-              'Lưu bệnh án',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 
-  // Modal Xem Lịch Sử Bệnh Án
   void _showMedicalRecordsHistory(String patientId, String patientName) async {
     showModalBottomSheet(
       context: context,
@@ -331,7 +446,6 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
                       itemBuilder: (context, i) {
                         final item = records[i];
 
-                        // Xử lý đơn thuốc linh hoạt (mảng prescriptions hoặc chuỗi prescription)
                         String prescriptionText = '';
                         if (item['prescriptions'] is List &&
                             (item['prescriptions'] as List).isNotEmpty) {
@@ -347,9 +461,9 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
                                       p['dosage'].toString().isNotEmpty
                                   ? ' - ${p['dosage']}'
                                   : '';
-                              drugItems.add('$name$quantity$dosage');
+                              drugItems.add('• $name$quantity$dosage');
                             } else if (p is String) {
-                              drugItems.add(p);
+                              drugItems.add('• $p');
                             }
                           }
                           prescriptionText = drugItems.join('\n');
@@ -501,7 +615,6 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
             ...items.map((a) {
               final id = a['_id'] ?? a['id'] ?? '';
               
-              // 1. Trích xuất Doctor ID chính xác từ Doctor Profile
               final doctorData = a['doctorId'];
               String rawDoctorId = '';
               if (doctorData is Map) {
@@ -510,7 +623,6 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
                 rawDoctorId = doctorData;
               }
 
-              // 2. Trích xuất Patient info
               final patient = a['patientId'];
               String patientId = '';
               String patientName = 'Bệnh nhân';
@@ -634,7 +746,6 @@ class _DoctorAppointmentsPageState extends State<DoctorAppointmentsPage> {
                         ),
                       ),
 
-                    // Thao tác xử lý dành riêng cho Bác sĩ
                     if (status == 'PENDING')
                       Padding(
                         padding: const EdgeInsets.only(top: 12),
